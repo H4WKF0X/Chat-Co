@@ -35,3 +35,6 @@ build/
 
 ### Secret Properties ###
 src/main/resources/secret.properties
+
+*.jks
+*.crt
