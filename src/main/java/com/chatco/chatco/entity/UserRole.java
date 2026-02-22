@@ -11,18 +11,19 @@ import org.hibernate.annotations.OnDeleteAction;
 @AllArgsConstructor
 @Data
 @Entity
-@Table(name = "message_attachment")
-public class Message_attachment {
+@Table(name = "user_role")
+public class UserRole {
     @MapsId
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "file_attachment_id", nullable = false)
-    private File_attachment fileAttachment;
+    @JoinColumn(name = "role_id", nullable = false)
+    private Role role;
     @MapsId
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "message_id", nullable = false)
-    private Message message;
+    @JoinColumn(name = "user_id", nullable = false)
+    private AppUser user;
     @EmbeddedId
-    private Message_attachmentId id;
+    private UserRoleId id;
+
 }

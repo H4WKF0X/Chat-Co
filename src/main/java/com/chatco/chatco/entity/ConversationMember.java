@@ -12,7 +12,7 @@ import org.hibernate.annotations.OnDeleteAction;
 @Data
 @Entity
 @Table(name = "conversation_member")
-public class Conversation_member {
+public class ConversationMember {
     @MapsId
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
@@ -22,7 +22,7 @@ public class Conversation_member {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "user_id", nullable = false)
-    private App_user user;
+    private AppUser user;
     @EmbeddedId
-    private Conversation_memberId id;
+    private ConversationMemberId id;
 }

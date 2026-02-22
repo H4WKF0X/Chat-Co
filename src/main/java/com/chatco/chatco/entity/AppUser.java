@@ -15,7 +15,7 @@ import java.time.OffsetDateTime;
 @Data
 @Entity
 @Table(name = "app_user")
-public class App_user {
+public class AppUser {
     @NotNull
     @ColumnDefault("now()")
     @Column(name = "created_at", nullable = false)

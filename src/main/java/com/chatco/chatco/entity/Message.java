@@ -31,7 +31,7 @@ public class Message {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.RESTRICT)
     @JoinColumn(name = "sender_id", nullable = false)
-    private App_user sender;
+    private AppUser sender;
     @Column(name = "deleted_at")
     private OffsetDateTime deletedAt;
     @NotNull

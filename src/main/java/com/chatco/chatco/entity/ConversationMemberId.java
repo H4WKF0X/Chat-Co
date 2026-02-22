@@ -13,15 +13,15 @@ import java.io.Serializable;
 @Setter
 @EqualsAndHashCode
 @Embeddable
-public class User_roleId implements Serializable {
-    private static final long serialVersionUID = -791009602686440163L;
+public class ConversationMemberId implements Serializable {
+    private static final long serialVersionUID = 113743541802576226L;
     @NotNull
     @Column(name = "user_id", nullable = false)
     private Long userId;
 
     @NotNull
-    @Column(name = "role_id", nullable = false)
-    private Long roleId;
+    @Column(name = "conversation_id", nullable = false)
+    private Long conversationId;
 
 
 }

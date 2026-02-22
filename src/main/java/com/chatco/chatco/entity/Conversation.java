@@ -22,7 +22,7 @@ public class Conversation {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.RESTRICT)
     @JoinColumn(name = "creator_id", nullable = false)
-    private App_user creator;
+    private AppUser creator;
     @NotNull
     @ColumnDefault("now()")
     @Column(name = "created_at", nullable = false)

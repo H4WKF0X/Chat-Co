@@ -17,12 +17,12 @@ import java.time.OffsetDateTime;
 @Data
 @Entity
 @Table(name = "file_attachment")
-public class File_attachment {
+public class FileAttachment {
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.RESTRICT)
     @JoinColumn(name = "uploaded_by_id", nullable = false)
-    private App_user uploadedBy;
+    private AppUser uploadedBy;
     @NotNull
     @ColumnDefault("now()")
     @Column(name = "uploaded_at", nullable = false)

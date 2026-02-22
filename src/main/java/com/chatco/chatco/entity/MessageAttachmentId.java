@@ -13,7 +13,7 @@ import java.io.Serializable;
 @Setter
 @EqualsAndHashCode
 @Embeddable
-public class Message_attachmentId implements Serializable {
+public class MessageAttachmentId implements Serializable {
     private static final long serialVersionUID = 635609960442905902L;
     @NotNull
     @Column(name = "message_id", nullable = false)
