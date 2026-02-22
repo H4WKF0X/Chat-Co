@@ -13,17 +13,19 @@ import org.hibernate.annotations.OnDeleteAction;
 @Entity
 @Table(name = "user_role")
 public class UserRole {
-    @MapsId
+
+    @EmbeddedId
+    private UserRoleId id;
+
+    @MapsId("roleId")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "role_id", nullable = false)
     private Role role;
-    @MapsId
+
+    @MapsId("userId")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "user_id", nullable = false)
     private AppUser user;
-    @EmbeddedId
-    private UserRoleId id;
-
 }

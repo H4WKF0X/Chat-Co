@@ -7,6 +7,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
+import jakarta.persistence.PrePersist;
+import java.time.LocalDateTime;
 
 import java.time.OffsetDateTime;
 
@@ -42,4 +44,13 @@ public class AppUser {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
+    @PrePersist
+    public void prePersist() {
+        if (createdAt == null) {
+            createdAt = OffsetDateTime.now();
+        }
+        if (isActive == null) {
+            isActive = true;
+        }
+    }
 }

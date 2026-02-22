@@ -3,18 +3,20 @@ package com.chatco.chatco.entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.NotNull;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.io.Serializable;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @EqualsAndHashCode
 @Embeddable
 public class UserRoleId implements Serializable {
-    private static final long serialVersionUID = -791009602686440163L;
+
+    private static final long serialVersionUID = 1L;
+
     @NotNull
     @Column(name = "user_id", nullable = false)
     private Long userId;
@@ -22,6 +24,4 @@ public class UserRoleId implements Serializable {
     @NotNull
     @Column(name = "role_id", nullable = false)
     private Long roleId;
-
-
 }
