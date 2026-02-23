@@ -56,7 +56,7 @@ public class TestUserCreateView extends VerticalLayout {
                 AppUser user = new AppUser();
                 user.setUsername(username);
                 user.setDisplayName(displayName.isBlank() ? username : displayName);
-                user.setMail(mail.isBlank() ? username + "@chatco.local" : mail);
+                user.setMail(mail.isBlank() ? username + "@student.tgm.ac.at" : mail);
                 user.setLdapUid(ldapUid.isBlank() ? username : ldapUid);
                 user.setIsActive(true); // Falls dein Feld anders heißt -> anpassen
 
