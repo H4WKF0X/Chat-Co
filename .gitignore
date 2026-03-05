@@ -38,3 +38,6 @@ src/main/resources/secret.properties
 
 *.jks
 *.crt
+*.bkp
+
+.DS_Store
