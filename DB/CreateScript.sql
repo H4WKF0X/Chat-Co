@@ -1,4 +1,4 @@
--- Chat-Co PostgreSQL Create Script (bereinigt für DataGrip)
+-- Chat-Co PostgreSQL Create Script (erweitert für DataGrip)
 -- Variante ohne ENUM-Typen -> weniger Probleme im Editor
 
 -- 1) Benutzer
@@ -32,7 +32,15 @@ CREATE TABLE IF NOT EXISTS conversation (
         ON DELETE RESTRICT
 );
 
--- 4) Dateien / Uploads
+-- 4) Räume
+CREATE TABLE IF NOT EXISTS room (
+    id              BIGSERIAL PRIMARY KEY,
+    name            VARCHAR(150) NOT NULL UNIQUE,
+    capacity        INTEGER NOT NULL CHECK (capacity > 0),
+    location        VARCHAR(255) NOT NULL
+);
+
+-- 5) Dateien / Uploads
 CREATE TABLE IF NOT EXISTS file_attachment (
     id              BIGSERIAL PRIMARY KEY,
     stored_name     VARCHAR(255) NOT NULL,      -- interner Dateiname
@@ -48,7 +56,29 @@ CREATE TABLE IF NOT EXISTS file_attachment (
         ON DELETE RESTRICT
 );
 
--- 5) Nachrichten (rekursive Beziehung über reply_to_message_id)
+-- 6) Meetings
+CREATE TABLE IF NOT EXISTS meeting (
+    id                  BIGSERIAL PRIMARY KEY,
+    title               VARCHAR(255) NOT NULL,
+    description         TEXT,
+    start_at            TIMESTAMPTZ NOT NULL,
+    end_at              TIMESTAMPTZ NOT NULL,
+    location_or_link    VARCHAR(500),
+    room_id             BIGINT,
+    conversation_id     BIGINT NOT NULL UNIQUE,
+    CONSTRAINT chk_meeting_time
+        CHECK (end_at > start_at),
+    CONSTRAINT fk_meeting_room
+        FOREIGN KEY (room_id)
+        REFERENCES room(id)
+        ON DELETE SET NULL,
+    CONSTRAINT fk_meeting_conversation
+        FOREIGN KEY (conversation_id)
+        REFERENCES conversation(id)
+        ON DELETE CASCADE
+);
+
+-- 7) Nachrichten (rekursive Beziehung über reply_to_message_id)
 CREATE TABLE IF NOT EXISTS message (
     id                  BIGSERIAL PRIMARY KEY,
     message_type        VARCHAR(20) NOT NULL DEFAULT 'text'
@@ -73,7 +103,7 @@ CREATE TABLE IF NOT EXISTS message (
         ON DELETE SET NULL
 );
 
--- 6) Benutzer <-> Rolle (n:m)
+-- 8) Benutzer <-> Rolle (n:m)
 CREATE TABLE IF NOT EXISTS user_role (
     user_id          BIGINT NOT NULL,
     role_id          BIGINT NOT NULL,
@@ -88,7 +118,7 @@ CREATE TABLE IF NOT EXISTS user_role (
         ON DELETE CASCADE
 );
 
--- 7) Benutzer <-> Konversation (Mitglieder) (n:m)
+-- 9) Benutzer <-> Konversation (Mitglieder) (n:m)
 CREATE TABLE IF NOT EXISTS conversation_member (
     user_id          BIGINT NOT NULL,
     conversation_id  BIGINT NOT NULL,
@@ -103,7 +133,7 @@ CREATE TABLE IF NOT EXISTS conversation_member (
         ON DELETE CASCADE
 );
 
--- 8) Nachricht <-> Dateianhang (n:m)
+-- 10) Nachricht <-> Dateianhang (n:m)
 CREATE TABLE IF NOT EXISTS message_attachment (
     message_id           BIGINT NOT NULL,
     file_attachment_id   BIGINT NOT NULL,
@@ -118,22 +148,22 @@ CREATE TABLE IF NOT EXISTS message_attachment (
         ON DELETE CASCADE
 );
 
--- =========================
--- Indizes (Performance)
--- =========================
-CREATE INDEX IF NOT EXISTS idx_message_conversation_id ON message(conversation_id);
-CREATE INDEX IF NOT EXISTS idx_message_sender_id ON message(sender_id);
-CREATE INDEX IF NOT EXISTS idx_message_sent_at ON message(sent_at);
-CREATE INDEX IF NOT EXISTS idx_message_reply_to_id ON message(reply_to_message_id);
-
-CREATE INDEX IF NOT EXISTS idx_conversation_creator_id ON conversation(creator_id);
-
-CREATE INDEX IF NOT EXISTS idx_file_uploaded_by_id ON file_attachment(uploaded_by_id);
-CREATE INDEX IF NOT EXISTS idx_file_uploaded_at ON file_attachment(uploaded_at);
-
-CREATE INDEX IF NOT EXISTS idx_conversation_member_user_id ON conversation_member(user_id);
-CREATE INDEX IF NOT EXISTS idx_user_role_role_id ON user_role(role_id);
-
+-- 11) Meeting <-> Teilnehmer (n:m)
+CREATE TABLE IF NOT EXISTS meeting_participant (
+    meeting_id           BIGINT NOT NULL,
+    user_id              BIGINT NOT NULL,
+    participant_status   VARCHAR(20) NOT NULL
+                         CHECK (participant_status IN ('invited', 'accepted', 'declined', 'tentative')),
+    PRIMARY KEY (meeting_id, user_id),
+    CONSTRAINT fk_meeting_participant_meeting
+        FOREIGN KEY (meeting_id)
+        REFERENCES meeting(id)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_meeting_participant_user
+        FOREIGN KEY (user_id)
+        REFERENCES app_user(id)
+        ON DELETE CASCADE
+);
 -- =========================
 -- Optionale Startdaten
 -- =========================
