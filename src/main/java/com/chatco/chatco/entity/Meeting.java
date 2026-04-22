@@ -22,6 +22,10 @@ public class Meeting {
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "conversation_id", nullable = false)
     private Conversation conversation;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.SET_NULL)
+    @JoinColumn(name = "room_id")
+    private Room room;
     @Size(max = 500)
     @Column(name = "location_or_link", length = 500)
     private String locationOrLink;
@@ -41,4 +45,5 @@ public class Meeting {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
+
 }
