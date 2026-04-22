@@ -8,7 +8,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 import jakarta.persistence.PrePersist;
-import com.chatco.chatco.role.Role;
 
 import java.time.OffsetDateTime;
 
@@ -18,8 +17,6 @@ import java.time.OffsetDateTime;
 @Entity
 @Table(name = "app_user")
 public class AppUser {
-    @Enumerated(EnumType.STRING)
-    private Role role;
     @NotNull
     @ColumnDefault("now()")
     @Column(name = "created_at", nullable = false)
