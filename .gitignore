@@ -19,6 +19,7 @@ target/
 *.iws
 *.iml
 *.ipr
+Dokumentation/GUI_Plan.md
 
 ### NetBeans ###
 /nbproject/private/
@@ -39,3 +40,14 @@ src/main/resources/secret.properties
 *.jks
 *.crt
 *.bkp.DS_Store
+
+
+### Vaadin generated ###
+src/main/frontend/generated/
+src/main/bundles/
+vite.generated.ts
+
+### Secrets & logs ###
+.env
+.env.local
+*.log

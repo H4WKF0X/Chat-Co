@@ -1,0 +1,40 @@
+1. Projektziel
+Das Ziel des Projekts Chat-Co ist die Entwicklung einer sicheren, plattformübergreifenden Kommunikationslösung, die als On-Premise-Modell direkt auf der Infrastruktur des Kunden betrieben wird.
+Im Gegensatz zu Cloud-basierten Messengern behält die Firma die volle Souveränität über ihre Daten. Das System unterstützt die tägliche Zusammenarbeit durch Text-Chats, 
+Dateiaustausch und optionale Echtzeit-Kommunikation.
+
+2. Funktionale Schwerpunkte
+Hybride Nutzerverwaltung: Anbindung an bestehende Unternehmensstrukturen via LDAP/Active Directory sowie Bereitstellung einer manuellen Registrierung.
+
+Rollen- & Berechtigungssystem: Implementierung eines Permission-Systems für differenzierte Zugriffe (z. B. Gast- vs. Mitarbeiter-Accounts).
+
+Multi-Channel-Kommunikation: * Textbasierte Chats und Bildübertragung (TLS-verschlüsselt).
+
+Optionale Integration von Sprach- und Videoanrufen mit Ende-zu-Ende-Verschlüsselung (E2EE).
+
+Zentrale Administration: Bereitstellung eines Dashboards für Administratoren zur Verwaltung von Nutzern, System-Logs und Backups.
+
+Client-Verfügbarkeit: Zugriff über eine Web-Oberfläche (optimiert für gängige Browser) sowie eine native Desktop-Applikation.
+
+3. Technisches Stack
+Die technische Umsetzung erfolgt unter Berücksichtigung der bestehenden Java-Expertise des Teams, wobei der Fokus auf einer wartungsfreundlichen Architektur ohne hohen JavaScript-Anteil liegt:
+
+Backend: Entwicklung in Java mit Spring Boot, optimiert für WebSockets zur Echtzeit-Kommunikation.
+
+Frontend (Web): Umsetzung mit Vaadin, um die UI-Logik primär in Java abzubilden.
+
+Desktop-App: Realisierung mittels JavaFX oder durch Kapselung des Web-Interface via Electron.
+
+Datenbank: Einsatz von PostgreSQL zur persistenten Speicherung von Nutzerdaten und Verläufen.
+
+Infrastruktur: Containerisierung via Docker für ein unkompliziertes Deployment in der Kundenumgebung (Windows-basiert).
+
+4. Projektorganisation
+Gemäß den ITP-Richtlinien wird das Projekt im Team bearbeitet:
+
+Projektleitung (PM): Alexander Rutz
+
+Teammitglieder: Maximilian Paesold, Sebastian Weigl
+
+
+Methodik: Alle Mitglieder beteiligen sich an Logik, GUI und Datenbank, um eine ganzheitliche Praxisbeurteilung zu ermöglichen. Die Entwicklung erfolgt nach dem MVC-Prinzip (Model-View-Controller).
