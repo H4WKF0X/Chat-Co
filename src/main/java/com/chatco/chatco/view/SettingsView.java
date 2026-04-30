@@ -1,0 +1,244 @@
+package com.chatco.chatco.view;
+
+import com.chatco.chatco.model.AppUser;
+import com.chatco.chatco.model.UserStatus;
+import com.chatco.chatco.service.UserService;
+import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.avatar.Avatar;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.dialog.Dialog;
+import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.NotificationVariant;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.tabs.Tab;
+import com.vaadin.flow.component.tabs.Tabs;
+import com.vaadin.flow.component.textfield.PasswordField;
+import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.auth.AnonymousAllowed;
+
+@Route(value = "settings", layout = MainLayout.class)
+@AnonymousAllowed
+public class SettingsView extends VerticalLayout {
+
+    public SettingsView(UserService userService) {
+        addClassName("cc-settings-view");
+        setSizeFull();
+        setPadding(false);
+        setSpacing(false);
+
+        AppUser user = userService.getCurrentUser();
+
+        Div header = new Div(new Span("Settings"));
+        header.addClassName("cc-settings-header");
+
+        Tab profileTab      = new Tab("Profile");
+        Tab appearanceTab   = new Tab("Appearance");
+        Tab notifTab        = new Tab("Notifications");
+        Tab accountTab      = new Tab("Account");
+        Tabs tabs = new Tabs(profileTab, appearanceTab, notifTab, accountTab);
+        tabs.addClassName("cc-settings-tabs");
+
+        Div content = new Div();
+        content.addClassName("cc-settings-content");
+
+        Div profilePanel     = buildProfilePanel(user);
+        Div appearancePanel  = buildAppearancePanel();
+        Div notifPanel       = buildNotificationsPanel();
+        Div accountPanel     = buildAccountPanel();
+
+        content.add(profilePanel, appearancePanel, notifPanel, accountPanel);
+
+        appearancePanel.setVisible(false);
+        notifPanel.setVisible(false);
+        accountPanel.setVisible(false);
+
+        tabs.addSelectedChangeListener(e -> {
+            Tab selected = e.getSelectedTab();
+            profilePanel.setVisible(selected == profileTab);
+            appearancePanel.setVisible(selected == appearanceTab);
+            notifPanel.setVisible(selected == notifTab);
+            accountPanel.setVisible(selected == accountTab);
+        });
+
+        add(header, tabs, content);
+        expand(content);
+    }
+
+    private Div buildProfilePanel(AppUser user) {
+        Div panel = new Div();
+        panel.addClassName("cc-settings-panel");
+
+        Avatar avatar = new Avatar(user.displayName());
+        avatar.setWidth("72px");
+        avatar.setHeight("72px");
+
+        Button changePhoto = new Button("Change photo");
+        changePhoto.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_SMALL);
+        changePhoto.addClickListener(e -> toast("Photo upload not yet implemented", false));
+
+        Div avatarRow = new Div(avatar, changePhoto);
+        avatarRow.addClassName("cc-settings-avatar-row");
+
+        TextField displayName = new TextField("Display name");
+        displayName.setValue(user.displayName());
+        displayName.setWidthFull();
+
+        TextField username = new TextField("Username");
+        username.setValue(user.username());
+        username.setReadOnly(true);
+        username.setWidthFull();
+
+        TextField email = new TextField("Email");
+        email.setValue(user.mail());
+        email.setReadOnly(true);
+        email.setWidthFull();
+
+        ComboBox<UserStatus> statusBox = new ComboBox<>("Status");
+        statusBox.setItems(UserStatus.values());
+        statusBox.setValue(user.status());
+        statusBox.setItemLabelGenerator(s -> switch (s) {
+            case ACTIVE   -> "Active";
+            case AWAY     -> "Away";
+            case INACTIVE -> "Inactive";
+        });
+        statusBox.setWidthFull();
+
+        Button save = new Button("Save changes");
+        save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        save.addClickListener(e -> toast("Profile saved (stub)", true));
+
+        panel.add(avatarRow, displayName, username, email, statusBox, save);
+        return panel;
+    }
+
+    private Div buildAppearancePanel() {
+        Div panel = new Div();
+        panel.addClassName("cc-settings-panel");
+
+        Span themeLabel = new Span("Theme");
+        themeLabel.addClassName("cc-settings-label");
+
+        Button darkBtn  = new Button("Dark");
+        Button lightBtn = new Button("Light");
+        darkBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
+        lightBtn.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_SMALL);
+        darkBtn.addClickListener(e -> {
+            UI.getCurrent().getElement().setAttribute("theme", "dark");
+            darkBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+            lightBtn.removeThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        });
+        lightBtn.addClickListener(e -> {
+            UI.getCurrent().getElement().setAttribute("theme", "");
+            lightBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+            darkBtn.removeThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        });
+
+        HorizontalLayout themeRow = new HorizontalLayout(darkBtn, lightBtn);
+        themeRow.addClassName("cc-settings-theme-row");
+
+        Span accentLabel = new Span("Accent colour");
+        accentLabel.addClassName("cc-settings-label");
+
+        String[] accents = {"#5b8dee", "#3ba55c", "#ed4245", "#faa61a", "#9b59b6", "#1abc9c"};
+        Div swatches = new Div();
+        swatches.addClassName("cc-settings-swatches");
+        for (String color : accents) {
+            Div swatch = new Div();
+            swatch.addClassName("cc-settings-swatch");
+            swatch.getStyle().set("background", color);
+            swatch.addClickListener(e ->
+                    UI.getCurrent().getPage().executeJs(
+                            "document.documentElement.style.setProperty('--cc-accent', $0)", color));
+            swatches.add(swatch);
+        }
+
+        panel.add(themeLabel, themeRow, accentLabel, swatches);
+        return panel;
+    }
+
+    private Div buildNotificationsPanel() {
+        Div panel = new Div();
+        panel.addClassName("cc-settings-panel");
+
+        panel.add(buildToggleRow("Sound on new message", false));
+        panel.add(buildToggleRow("Desktop notifications", false));
+        return panel;
+    }
+
+    private Div buildToggleRow(String label, boolean defaultOn) {
+        com.vaadin.flow.component.checkbox.Checkbox toggle = new com.vaadin.flow.component.checkbox.Checkbox(label, defaultOn);
+        toggle.addValueChangeListener(e -> toast(label + ": " + (e.getValue() ? "on" : "off") + " (stub)", false));
+        Div row = new Div(toggle);
+        row.addClassName("cc-settings-toggle-row");
+        return row;
+    }
+
+    private Div buildAccountPanel() {
+        Div panel = new Div();
+        panel.addClassName("cc-settings-panel");
+
+        Button changePassword = new Button("Change Password");
+        changePassword.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+        changePassword.addClickListener(e -> openChangePasswordDialog());
+
+        Button deactivate = new Button("Deactivate Account");
+        deactivate.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_TERTIARY);
+        deactivate.addClickListener(e -> openDeactivateDialog());
+
+        panel.add(changePassword, deactivate);
+        return panel;
+    }
+
+    private void openChangePasswordDialog() {
+        Dialog dialog = new Dialog();
+        dialog.setHeaderTitle("Change Password");
+
+        PasswordField current = new PasswordField("Current password");
+        PasswordField newPass = new PasswordField("New password");
+        PasswordField confirm = new PasswordField("Confirm new password");
+        current.setWidthFull();
+        newPass.setWidthFull();
+        confirm.setWidthFull();
+
+        Button save = new Button("Save", e -> {
+            toast("Password change not yet implemented", false);
+            dialog.close();
+        });
+        save.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
+        Button cancel = new Button("Cancel", e -> dialog.close());
+        cancel.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_SMALL);
+
+        dialog.add(current, newPass, confirm, new HorizontalLayout(save, cancel));
+        dialog.open();
+    }
+
+    private void openDeactivateDialog() {
+        Dialog dialog = new Dialog();
+        dialog.setHeaderTitle("Deactivate Account");
+
+        Span msg = new Span("Are you sure you want to deactivate your account? This cannot be undone.");
+        msg.addClassName("cc-confirm-msg");
+
+        Button confirm = new Button("Deactivate", e -> {
+            toast("Account deactivation not yet implemented", false);
+            dialog.close();
+        });
+        confirm.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
+        Button cancel = new Button("Cancel", e -> dialog.close());
+        cancel.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_SMALL);
+
+        dialog.add(msg, new HorizontalLayout(confirm, cancel));
+        dialog.open();
+    }
+
+    private void toast(String message, boolean success) {
+        Notification notif = Notification.show(message, 3000, Notification.Position.BOTTOM_END);
+        if (success) notif.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+    }
+}
