@@ -4,12 +4,14 @@ import com.chatco.chatco.model.*;
 import com.chatco.chatco.service.ConversationService;
 import com.chatco.chatco.service.MeetingService;
 import com.chatco.chatco.service.UserService;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
 import java.util.*;
 
 @Service
+@Profile("dev")
 public class StubMeetingService implements MeetingService {
 
     private final StubDataStore store;
