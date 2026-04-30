@@ -173,12 +173,12 @@ public class ConversationView extends VerticalLayout implements BeforeEnterObser
 
         List<AppUser> members = conversationService.getMembers(conversation.id());
         for (AppUser member : members) {
-            Div row = buildMemberRow(member, currentUser, true);
+            Div row = buildMemberRow(member, currentUser);
             memberPanel.add(row);
         }
     }
 
-    private Div buildMemberRow(AppUser member, AppUser currentUser, boolean clickable) {
+    private Div buildMemberRow(AppUser member, AppUser currentUser) {
         Avatar avatar = new Avatar(member.displayName());
         avatar.setWidth("32px");
         avatar.setHeight("32px");
@@ -192,7 +192,7 @@ public class ConversationView extends VerticalLayout implements BeforeEnterObser
 
         Div row = new Div(avatar, name, dot);
         row.addClassName("cc-member-row");
-        if (clickable && !member.id().equals(currentUser.id())) {
+        if (!member.id().equals(currentUser.id())) {
             row.addClickListener(e -> new UserDetailDialog(member, conversationService).open());
         }
         return row;

@@ -19,7 +19,7 @@ public class SidebarComponent extends VerticalLayout {
     private final Map<Long, Div> navItems = new HashMap<>();
     private Consumer<Conversation> onSelect;
 
-    // Unread badge counts (stub: static values per conversation id)
+    // Stub unread counts keyed by conversation ID (StubDataStore: general=1, dev-talk=2, dm-alex=4)
     private static final Map<Long, Integer> UNREAD = Map.of(
             1L, 3,
             2L, 1,

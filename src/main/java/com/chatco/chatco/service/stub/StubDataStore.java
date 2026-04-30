@@ -1,6 +1,7 @@
 package com.chatco.chatco.service.stub;
 
 import com.chatco.chatco.model.*;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.time.OffsetDateTime;
@@ -8,40 +9,41 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Component
+@Profile("dev")
 public class StubDataStore {
 
-    public final AppUser MAX;
-    public final AppUser ALEX;
-    public final AppUser SEBASTIAN;
-    public final AppUser LAURA;
-    public final AppUser TOM;
-    public final List<AppUser> allUsers;
+    final AppUser MAX;
+    final AppUser ALEX;
+    final AppUser SEBASTIAN;
+    final AppUser LAURA;
+    final AppUser TOM;
+    final List<AppUser> allUsers;
 
-    public final Conversation GENERAL;
-    public final Conversation DEV_TALK;
-    public final Conversation ANNOUNCEMENTS;
-    public final Conversation DM_ALEX;
-    public final Conversation DM_SEBASTIAN;
-    public final Conversation GROUP_ALPHA;
-    public final Conversation MEETING_SPRINT;
-    public final Conversation MEETING_ONBOARDING;
-    public final List<Conversation> allConversations;
+    final Conversation GENERAL;
+    final Conversation DEV_TALK;
+    final Conversation ANNOUNCEMENTS;
+    final Conversation DM_ALEX;
+    final Conversation DM_SEBASTIAN;
+    final Conversation GROUP_ALPHA;
+    final Conversation MEETING_SPRINT;
+    final Conversation MEETING_ONBOARDING;
+    final List<Conversation> allConversations;
 
-    public final Map<Long, List<AppUser>> membersByConversation;
-    public final Map<Long, List<Message>> messagesByConversation;
+    final Map<Long, List<AppUser>> membersByConversation;
+    final Map<Long, List<Message>> messagesByConversation;
 
-    public final Room ROOM_A;
-    public final Room ROOM_B;
-    public final Room ROOM_C;
-    public final List<Room> allRooms;
+    final Room ROOM_A;
+    final Room ROOM_B;
+    final Room ROOM_C;
+    final List<Room> allRooms;
 
-    public final Meeting MEETING_SPRINT_REVIEW;
-    public final Meeting MEETING_ONBOARDING_SESSION;
-    public final Meeting MEETING_ARCH_DISCUSSION;
-    public final Meeting MEETING_TEAM_LUNCH;
-    public final List<Meeting> allMeetings;
+    final Meeting MEETING_SPRINT_REVIEW;
+    final Meeting MEETING_ONBOARDING_SESSION;
+    final Meeting MEETING_ARCH_DISCUSSION;
+    final Meeting MEETING_TEAM_LUNCH;
+    final List<Meeting> allMeetings;
 
-    public final Map<Long, List<MeetingParticipant>> participantsByMeeting;
+    final Map<Long, List<MeetingParticipant>> participantsByMeeting;
 
     private final AtomicLong messageIdSeq = new AtomicLong(100);
     private final AtomicLong meetingIdSeq = new AtomicLong(10);

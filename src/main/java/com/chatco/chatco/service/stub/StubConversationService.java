@@ -5,12 +5,14 @@ import com.chatco.chatco.model.Conversation;
 import com.chatco.chatco.model.ConversationType;
 import com.chatco.chatco.service.ConversationService;
 import com.chatco.chatco.service.UserService;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
 import java.util.*;
 
 @Service
+@Profile("dev")
 public class StubConversationService implements ConversationService {
 
     private final StubDataStore store;

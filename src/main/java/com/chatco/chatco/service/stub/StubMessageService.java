@@ -5,20 +5,20 @@ import com.chatco.chatco.model.MessageType;
 import com.chatco.chatco.service.ConversationService;
 import com.chatco.chatco.service.MessageService;
 import com.chatco.chatco.service.UserService;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
 
 @Service
+@Profile("dev")
 public class StubMessageService implements MessageService {
 
     private final StubDataStore store;
     private final UserService userService;
     private final ConversationService conversationService;
-    private final AtomicLong idSeq = new AtomicLong(100L);
 
     public StubMessageService(StubDataStore store, UserService userService, ConversationService conversationService) {
         this.store = store;
@@ -70,7 +70,7 @@ public class StubMessageService implements MessageService {
                     .stream().filter(m -> m.id().equals(replyToId)).findFirst().orElse(null);
         }
         var message = new Message(
-                idSeq.incrementAndGet(),
+                store.getMessageIdSeq().incrementAndGet(),
                 content,
                 MessageType.TEXT,
                 OffsetDateTime.now(),
