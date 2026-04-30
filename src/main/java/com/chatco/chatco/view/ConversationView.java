@@ -5,11 +5,13 @@ import com.chatco.chatco.service.ConversationService;
 import com.chatco.chatco.service.MessageService;
 import com.chatco.chatco.service.UserService;
 import com.chatco.chatco.view.components.UserDetailDialog;
+import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.avatar.Avatar;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.messages.MessageInput;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
@@ -120,7 +122,7 @@ public class ConversationView extends VerticalLayout implements BeforeEnterObser
         replyBar.add(replyBarText, cancelReply);
         replyBar.setVisible(false);
 
-        com.vaadin.flow.component.messages.MessageInput input = new com.vaadin.flow.component.messages.MessageInput();
+        MessageInput input = new MessageInput();
         input.setWidthFull();
         input.addSubmitListener(e -> {
             if (conversation != null && !e.getValue().isBlank()) {
@@ -263,14 +265,14 @@ public class ConversationView extends VerticalLayout implements BeforeEnterObser
         avatarWrapper.addClassName("cc-msg-avatar-wrap");
         if (!isOwn) {
             avatarWrapper.addClickListener(e -> new UserDetailDialog(m.sender(), conversationService).open());
-            avatarWrapper.getStyle().set("cursor", "pointer");
+            avatarWrapper.addClassName("cc-clickable");
         }
 
         Span senderName = new Span(m.sender().displayName());
         senderName.addClassName("cc-msg-sender");
         if (!isOwn) {
             senderName.addClickListener(e -> new UserDetailDialog(m.sender(), conversationService).open());
-            senderName.getStyle().set("cursor", "pointer");
+            senderName.addClassName("cc-clickable");
         }
 
         Span timestamp = new Span(m.sentAt().format(TIME_FMT));
@@ -353,16 +355,7 @@ public class ConversationView extends VerticalLayout implements BeforeEnterObser
     }
 
     private void openInlineEdit(Message m) {
-        // Re-find the row and replace content with an edit field
-        messageArea.getChildren()
-                .filter(c -> c instanceof Div)
-                .map(c -> (Div) c)
-                .filter(row -> row.hasClassName("cc-msg-row"))
-                .forEach(row -> {
-                    // find matching row by scanning meta sender + we rely on refresh
-                });
-        // Simpler approach: show a dialog-style inline edit
-        com.vaadin.flow.component.dialog.Dialog dialog = new com.vaadin.flow.component.dialog.Dialog();
+        Dialog dialog = new Dialog();
         dialog.setHeaderTitle("Edit message");
 
         TextField field = new TextField();

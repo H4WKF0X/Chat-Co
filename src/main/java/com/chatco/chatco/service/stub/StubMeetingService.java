@@ -50,10 +50,20 @@ public class StubMeetingService implements MeetingService {
     public Meeting create(String title, String description, OffsetDateTime startAt, OffsetDateTime endAt,
                           String locationOrLink, Room room, List<Long> participantUserIds) {
         AppUser organiser = userService.getCurrentUser();
-        Conversation conv = new Conversation(
-                store.allConversations.stream().mapToLong(c -> c.id()).max().orElse(0) + 1,
-                ConversationType.GROUP, title, organiser, OffsetDateTime.now()
-        );
+        long convId = store.allConversations.stream().mapToLong(Conversation::id).max().orElse(0) + 1;
+        Conversation conv = new Conversation(convId, ConversationType.GROUP, title, organiser, OffsetDateTime.now());
+        store.allConversations.add(conv);
+        store.messagesByConversation.put(convId, new ArrayList<>());
+
+        List<AppUser> convMembers = new ArrayList<>();
+        convMembers.add(organiser);
+        for (Long uid : participantUserIds) {
+            if (!uid.equals(organiser.id())) {
+                userService.findById(uid).ifPresent(convMembers::add);
+            }
+        }
+        store.membersByConversation.put(convId, convMembers);
+
         Meeting meeting = new Meeting(
                 store.getMeetingIdSeq().incrementAndGet(),
                 title, description, startAt, endAt, locationOrLink, room, conv

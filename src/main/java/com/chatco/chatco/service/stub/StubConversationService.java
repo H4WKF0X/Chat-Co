@@ -47,7 +47,7 @@ public class StubConversationService implements ConversationService {
 
     @Override
     public Conversation create(ConversationType type, String title, List<Long> memberUserIds) {
-        long newId = store.allConversations.stream().mapToLong(c -> c.id()).max().orElse(0) + 1;
+        long newId = store.allConversations.stream().mapToLong(Conversation::id).max().orElse(0) + 1;
         AppUser creator = userService.getCurrentUser();
         Conversation conv = new Conversation(newId, type, title, creator, OffsetDateTime.now());
         store.allConversations.add(conv);

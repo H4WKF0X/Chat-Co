@@ -44,9 +44,6 @@ public class MainLayout extends HorizontalLayout implements RouterLayout, AfterN
         railAdmin    = buildRailIcon("⚙", "Admin",    () -> UI.getCurrent().navigate("admin"));
         railAdmin.setVisible(isAdmin);
 
-        Div settingsBtn = buildRailIcon("⚙️", "Settings", () -> UI.getCurrent().navigate("settings"));
-        settingsBtn.addClassName("cc-rail-settings");
-
         add(buildRail(isAdmin), sidebar, contentArea);
         expand(contentArea);
     }
