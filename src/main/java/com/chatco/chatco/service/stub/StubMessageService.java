@@ -12,6 +12,11 @@ import java.time.OffsetDateTime;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Dev-profile stub implementation of {@link MessageService}.
+ * Messages are stored in-memory and lost on restart. Edits and deletes
+ * mutate the list in {@link StubDataStore} by replacing the affected record.
+ */
 @Service
 @Profile("dev")
 public class StubMessageService implements MessageService {

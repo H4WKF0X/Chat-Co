@@ -18,6 +18,12 @@ import com.vaadin.flow.server.auth.AnonymousAllowed;
 
 import java.util.*;
 
+/**
+ * View for creating a new group conversation.
+ *
+ * <p>The current user is always included as creator; the member list shows all
+ * other users with checkboxes. Clicking a row toggles the checkbox.
+ */
 @Route(value = "new-group", layout = MainLayout.class)
 @AnonymousAllowed
 public class NewGroupView extends VerticalLayout {

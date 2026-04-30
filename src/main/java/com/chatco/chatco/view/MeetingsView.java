@@ -32,6 +32,13 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
+/**
+ * Meetings and rooms view.
+ *
+ * <p>Two tabs: Meetings shows upcoming and past meetings as cards with RSVP
+ * controls; Rooms lists bookable rooms. Creating a meeting also creates a linked
+ * group conversation. RSVP changes are persisted in-memory via {@link MeetingService}.
+ */
 @Route(value = "meetings", layout = MainLayout.class)
 @AnonymousAllowed
 public class MeetingsView extends VerticalLayout {

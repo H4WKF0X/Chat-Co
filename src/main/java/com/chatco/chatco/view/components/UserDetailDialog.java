@@ -13,6 +13,13 @@ import com.vaadin.flow.component.html.Span;
 
 import java.time.format.DateTimeFormatter;
 
+/**
+ * Modal dialog showing a user's profile card.
+ *
+ * <p>Displays avatar, name, username, email, presence status, and join date.
+ * The "Send Message" button navigates to an existing direct message conversation
+ * with the user, if one exists. Creating a new DM is not yet supported here.
+ */
 public class UserDetailDialog extends Dialog {
 
     private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("dd. MMM yyyy");

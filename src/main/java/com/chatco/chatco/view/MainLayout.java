@@ -14,6 +14,14 @@ import com.vaadin.flow.router.AfterNavigationObserver;
 import com.vaadin.flow.router.RouterLayout;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 
+/**
+ * Application shell shared by all routes.
+ *
+ * <p>Renders the narrow icon rail on the left, the conversation sidebar, and
+ * the main content area. Implements {@link AfterNavigationObserver} to keep
+ * the active rail icon and sidebar state in sync with the current route.
+ * The admin rail icon is hidden for non-administrator users.
+ */
 @AnonymousAllowed
 public class MainLayout extends HorizontalLayout implements RouterLayout, AfterNavigationObserver {
 

@@ -8,6 +8,17 @@ import java.time.OffsetDateTime;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
+/**
+ * Central in-memory data store for the dev-profile stub layer.
+ *
+ * <p>Holds all seeded users, conversations, messages, rooms, meetings, and
+ * participant lists. Stub service implementations share this single bean so
+ * mutations made through one service (e.g. sending a message) are immediately
+ * visible through another (e.g. loading the conversation).
+ *
+ * <p>Fields are package-private so only stub services in this package can
+ * access them directly. Views must go through the service interfaces.
+ */
 @Component
 @Profile("dev")
 public class StubDataStore {

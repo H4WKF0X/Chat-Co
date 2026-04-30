@@ -16,6 +16,13 @@ import com.vaadin.flow.server.auth.AnonymousAllowed;
 
 import java.util.List;
 
+/**
+ * View for creating a new channel.
+ *
+ * <p>The channel name is lowercased and spaces are replaced with hyphens before
+ * creation. The description and private-toggle fields are present in the UI but
+ * not yet persisted by the stub backend.
+ */
 @Route(value = "new-channel", layout = MainLayout.class)
 @AnonymousAllowed
 public class NewChannelView extends VerticalLayout {

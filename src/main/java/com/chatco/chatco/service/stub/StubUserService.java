@@ -8,6 +8,11 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Dev-profile stub implementation of {@link UserService}.
+ * Always returns the seeded admin user as the current user.
+ * Swap for a real Spring Security–backed implementation when auth is wired up.
+ */
 @Service
 @Profile("dev")
 public class StubUserService implements UserService {
