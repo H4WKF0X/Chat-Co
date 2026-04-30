@@ -7,6 +7,7 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.Div;
@@ -172,7 +173,7 @@ public class SettingsView extends VerticalLayout {
     }
 
     private Div buildToggleRow(String label, boolean defaultOn) {
-        com.vaadin.flow.component.checkbox.Checkbox toggle = new com.vaadin.flow.component.checkbox.Checkbox(label, defaultOn);
+        Checkbox toggle = new Checkbox(label, defaultOn);
         toggle.addValueChangeListener(e -> toast(label + ": " + (e.getValue() ? "on" : "off") + " (stub)", false));
         Div row = new Div(toggle);
         row.addClassName("cc-settings-toggle-row");

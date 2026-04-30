@@ -11,21 +11,8 @@
     <groupId>com.chatco</groupId>
     <artifactId>chat-co</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>chat-co</name>
-    <description>chat-co</description>
-    <url/>
-    <licenses>
-        <license/>
-    </licenses>
-    <developers>
-        <developer/>
-    </developers>
-    <scm>
-        <connection/>
-        <developerConnection/>
-        <tag/>
-        <url/>
-    </scm>
+    <name>Chat-Co</name>
+    <description>On-premise enterprise messenger — self-hosted Slack/Teams alternative with Vaadin UI, Spring Boot backend, and PostgreSQL.</description>
     <properties>
         <java.version>21</java.version>
         <vaadin.version>25.0.5</vaadin.version>
