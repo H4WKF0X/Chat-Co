@@ -25,6 +25,15 @@ import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+/**
+ * Main chat view for a single conversation.
+ *
+ * <p>Displays the message list with date separators, a reply-to bar, and the
+ * message input. Supports inline message editing and soft-delete. An optional
+ * members panel slides in from the right when the Members button is clicked.
+ * The view is re-entered on every navigation to the same or a different
+ * conversation, at which point {@link #beforeEnter} reloads data.
+ */
 @Route(value = "conversation/:id", layout = MainLayout.class)
 @AnonymousAllowed
 public class ConversationView extends VerticalLayout implements BeforeEnterObserver {

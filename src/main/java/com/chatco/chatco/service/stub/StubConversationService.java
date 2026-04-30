@@ -11,6 +11,11 @@ import org.springframework.stereotype.Service;
 import java.time.OffsetDateTime;
 import java.util.*;
 
+/**
+ * Dev-profile stub implementation of {@link ConversationService}.
+ * Mutations (create, add member) are applied in-memory via {@link StubDataStore}
+ * and are lost on application restart.
+ */
 @Service
 @Profile("dev")
 public class StubConversationService implements ConversationService {

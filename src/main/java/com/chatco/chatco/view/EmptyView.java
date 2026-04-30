@@ -5,6 +5,12 @@ import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 
+/**
+ * Default home view shown when no conversation is selected.
+ *
+ * <p>Also used as the redirect target when a requested route is inaccessible
+ * (e.g. unknown conversation ID, insufficient role for admin view).
+ */
 @Route(value = "", layout = MainLayout.class)
 @AnonymousAllowed
 public class EmptyView extends Div {

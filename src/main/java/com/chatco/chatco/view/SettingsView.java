@@ -23,6 +23,13 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 
+/**
+ * User settings view with four tabs: Profile, Appearance, Notifications, and Account.
+ *
+ * <p>Profile changes (display name, status) and appearance settings (theme, accent
+ * colour) are applied immediately to the current session. Password change and account
+ * deactivation are stubbed and show a notification until the backend is connected.
+ */
 @Route(value = "settings", layout = MainLayout.class)
 @AnonymousAllowed
 public class SettingsView extends VerticalLayout {

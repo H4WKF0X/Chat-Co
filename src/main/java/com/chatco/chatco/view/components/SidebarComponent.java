@@ -14,6 +14,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
+/**
+ * Persistent left sidebar showing channels, groups, and direct messages.
+ *
+ * <p>Each section has an add-button that navigates to the corresponding
+ * creation view. The active conversation is highlighted via
+ * {@link #setActiveConversation(Long)}. The user footer at the bottom
+ * navigates to the settings view on click.
+ */
 public class SidebarComponent extends VerticalLayout {
 
     private final Map<Long, Div> navItems = new HashMap<>();

@@ -24,6 +24,13 @@ import com.vaadin.flow.server.auth.AnonymousAllowed;
 
 import java.time.format.DateTimeFormatter;
 
+/**
+ * Admin dashboard, accessible only to users with the {@code ADMINISTRATOR} role.
+ *
+ * <p>Provides three tabs: user management, channel management, and system info.
+ * Destructive actions (delete, deactivate) and data exports are stubbed and
+ * show a notification until the backend is connected.
+ */
 @Route(value = "admin", layout = MainLayout.class)
 @AnonymousAllowed
 public class AdminView extends VerticalLayout implements BeforeEnterObserver {
@@ -45,7 +52,6 @@ public class AdminView extends VerticalLayout implements BeforeEnterObserver {
 
     @Override
     public void beforeEnter(BeforeEnterEvent event) {
-        // Only admins may access this view
         if (userService.getCurrentUser().role() != UserRole.ADMINISTRATOR) {
             event.forwardTo(EmptyView.class);
             return;

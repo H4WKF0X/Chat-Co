@@ -8,6 +8,10 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Dev-profile stub implementation of {@link RoomService}.
+ * Returns the three seeded rooms from {@link StubDataStore}.
+ */
 @Service
 @Profile("dev")
 public class StubRoomService implements RoomService {

@@ -15,6 +15,12 @@ import com.vaadin.flow.server.auth.AnonymousAllowed;
 
 import java.util.List;
 
+/**
+ * View for starting a new direct message conversation.
+ *
+ * <p>Shows a searchable list of all users except the current one. Clicking a
+ * user opens the existing DM if one already exists, otherwise creates a new one.
+ */
 @Route(value = "new-dm", layout = MainLayout.class)
 @AnonymousAllowed
 public class NewDmView extends VerticalLayout {

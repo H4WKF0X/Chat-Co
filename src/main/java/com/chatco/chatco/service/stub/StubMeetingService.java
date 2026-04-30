@@ -10,6 +10,11 @@ import org.springframework.stereotype.Service;
 import java.time.OffsetDateTime;
 import java.util.*;
 
+/**
+ * Dev-profile stub implementation of {@link MeetingService}.
+ * Creating a meeting also creates a linked group conversation in
+ * {@link StubDataStore} so the meeting chat tab works end-to-end in the UI.
+ */
 @Service
 @Profile("dev")
 public class StubMeetingService implements MeetingService {
