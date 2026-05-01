@@ -28,7 +28,7 @@ import com.vaadin.flow.server.auth.AnonymousAllowed;
 
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -343,8 +343,14 @@ public class MeetingsView extends VerticalLayout {
                 titleField.setInvalid(true);
                 return;
             }
-            OffsetDateTime start = startPicker.getValue().atOffset(ZoneOffset.UTC);
-            OffsetDateTime end   = endPicker.getValue().atOffset(ZoneOffset.UTC);
+            ZoneId zone = ZoneId.systemDefault();
+            OffsetDateTime start = startPicker.getValue().atZone(zone).toOffsetDateTime();
+            OffsetDateTime end   = endPicker.getValue().atZone(zone).toOffsetDateTime();
+            if (!end.isAfter(start)) {
+                endPicker.setInvalid(true);
+                endPicker.setErrorMessage("End time must be after start time");
+                return;
+            }
             List<Long> ids = participantBox.getValue().stream().map(AppUser::id).toList();
             meetingService.create(
                     titleField.getValue().trim(),

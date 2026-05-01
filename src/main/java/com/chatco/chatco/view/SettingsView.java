@@ -169,16 +169,25 @@ public class SettingsView extends VerticalLayout {
         Span accentLabel = new Span("Accent colour");
         accentLabel.addClassName("cc-settings-label");
 
-        String[] accents = {"#5b8dee", "#3ba55c", "#ed4245", "#faa61a", "#9b59b6", "#1abc9c"};
+        String[][] accents = {
+            {"#5b8dee", "cc-swatch--blue"},
+            {"#3ba55c", "cc-swatch--green"},
+            {"#ed4245", "cc-swatch--red"},
+            {"#faa61a", "cc-swatch--yellow"},
+            {"#9b59b6", "cc-swatch--purple"},
+            {"#1abc9c", "cc-swatch--teal"}
+        };
         Div swatches = new Div();
         swatches.addClassName("cc-settings-swatches");
-        for (String color : accents) {
+        for (String[] accent : accents) {
+            String color = accent[0], cls = accent[1];
             Div swatch = new Div();
             swatch.addClassName("cc-settings-swatch");
-            swatch.getStyle().set("background", color);
+            swatch.addClassName(cls);
             swatch.addClickListener(e ->
                     UI.getCurrent().getPage().executeJs(
-                            "document.documentElement.style.setProperty('--cc-accent', $0)", color));
+                            "document.documentElement.style.setProperty('--cc-accent',$0);" +
+                            "localStorage.setItem('cc-accent',$0);", color));
             swatches.add(swatch);
         }
 

@@ -202,22 +202,27 @@ public class ConversationView extends VerticalLayout implements BeforeEnterObser
         Div row = new Div(avatar, name, dot);
         row.addClassName("cc-member-row");
         if (!member.id().equals(currentUser.id())) {
-            row.addClickListener(e -> new UserDetailDialog(member, conversationService).open());
+            row.addClickListener(e -> new UserDetailDialog(member, currentUser, conversationService).open());
         }
         return row;
     }
 
     @Override
     public void beforeEnter(BeforeEnterEvent event) {
-        event.getRouteParameters().get("id").map(Long::parseLong)
-                .flatMap(conversationService::findById)
-                .ifPresentOrElse(conv -> {
-                    conversation = conv;
-                    clearReplyTarget();
-                    updateHeader(conv);
-                    refreshMessages();
-                    if (memberPanelOpen) rebuildMemberPanel();
-                }, () -> event.forwardTo(EmptyView.class));
+        try {
+            event.getRouteParameters().get("id")
+                    .map(Long::parseLong)
+                    .flatMap(conversationService::findById)
+                    .ifPresentOrElse(conv -> {
+                        conversation = conv;
+                        clearReplyTarget();
+                        updateHeader(conv);
+                        refreshMessages();
+                        if (memberPanelOpen) rebuildMemberPanel();
+                    }, () -> event.forwardTo(EmptyView.class));
+        } catch (NumberFormatException e) {
+            event.forwardTo(EmptyView.class);
+        }
     }
 
     private void updateHeader(Conversation conv) {
@@ -273,14 +278,14 @@ public class ConversationView extends VerticalLayout implements BeforeEnterObser
         Div avatarWrapper = new Div(avatar);
         avatarWrapper.addClassName("cc-msg-avatar-wrap");
         if (!isOwn) {
-            avatarWrapper.addClickListener(e -> new UserDetailDialog(m.sender(), conversationService).open());
+            avatarWrapper.addClickListener(e -> new UserDetailDialog(m.sender(), currentUser, conversationService).open());
             avatarWrapper.addClassName("cc-clickable");
         }
 
         Span senderName = new Span(m.sender().displayName());
         senderName.addClassName("cc-msg-sender");
         if (!isOwn) {
-            senderName.addClickListener(e -> new UserDetailDialog(m.sender(), conversationService).open());
+            senderName.addClickListener(e -> new UserDetailDialog(m.sender(), currentUser, conversationService).open());
             senderName.addClassName("cc-clickable");
         }
 
