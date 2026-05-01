@@ -59,6 +59,18 @@ html {
 }
 
 /* ================================================================
+   Dark theme — re-pin Lumo primary vars to our accent so the
+   accent colour picker works (html[theme~="dark"] beats Vaadin's
+   [theme~="dark"] in specificity and prevents it overwriting these)
+   ================================================================ */
+html[theme~="dark"] {
+  --lumo-primary-color:        var(--cc-accent);
+  --lumo-primary-text-color:   var(--cc-accent);
+  --lumo-primary-color-50pct:  rgba(91, 141, 238, 0.5);
+  --lumo-primary-color-10pct:  rgba(91, 141, 238, 0.1);
+}
+
+/* ================================================================
    Light theme overrides  (no theme="dark" attribute on <html>)
    ================================================================ */
 html:not([theme~="dark"]) {
