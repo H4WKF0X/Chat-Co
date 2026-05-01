@@ -46,6 +46,9 @@ src/main/resources/secret.properties
 src/main/frontend/generated/
 src/main/bundles/
 vite.generated.ts
+vite.config.ts
+tsconfig.json
+types.d.ts
 
 ### Secrets & logs ###
 .env
