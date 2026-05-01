@@ -57,7 +57,9 @@ public class MainLayout extends HorizontalLayout implements RouterLayout, AfterN
 
         UI.getCurrent().getPage().executeJs(
                 "if(localStorage.getItem('cc-theme')!=='light')" +
-                "{document.documentElement.setAttribute('theme','dark')}");
+                "{document.documentElement.setAttribute('theme','dark')};" +
+                "var a=localStorage.getItem('cc-accent');" +
+                "if(a)document.documentElement.style.setProperty('--cc-accent',a);");
     }
 
     private Div buildRail(boolean isAdmin) {

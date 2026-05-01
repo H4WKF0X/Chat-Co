@@ -24,7 +24,7 @@ public class UserDetailDialog extends Dialog {
 
     private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("dd. MMM yyyy");
 
-    public UserDetailDialog(AppUser user, ConversationService conversationService) {
+    public UserDetailDialog(AppUser user, AppUser currentUser, ConversationService conversationService) {
         addClassName("cc-user-detail-dialog");
         setWidth("320px");
 
@@ -65,10 +65,14 @@ public class UserDetailDialog extends Dialog {
             conversationService.getByType(ConversationType.DIRECT).stream()
                     .filter(c -> {
                         var members = conversationService.getMembers(c.id());
-                        return members.stream().anyMatch(m -> m.id().equals(user.id()));
+                        return members.stream().anyMatch(m -> m.id().equals(user.id()))
+                            && members.stream().anyMatch(m -> m.id().equals(currentUser.id()));
                     })
                     .findFirst()
-                    .ifPresent(c -> UI.getCurrent().navigate("conversation/" + c.id()));
+                    .ifPresentOrElse(
+                            c -> UI.getCurrent().navigate("conversation/" + c.id()),
+                            () -> UI.getCurrent().navigate("new-dm")
+                    );
         });
 
         Button closeBtn = new Button("Close");

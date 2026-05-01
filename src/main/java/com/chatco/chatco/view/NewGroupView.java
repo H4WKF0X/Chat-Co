@@ -88,6 +88,7 @@ public class NewGroupView extends VerticalLayout {
             if (e.getValue()) selectedIds.add(user.id());
             else              selectedIds.remove(user.id());
         });
+        check.getElement().addEventListener("click", evt -> {}).addEventData("event.stopPropagation()");
 
         Div row = new Div(check, avatar, name);
         row.addClassName("cc-new-conv-user-row");

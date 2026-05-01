@@ -973,6 +973,13 @@ body > div {
   box-shadow: var(--cc-shadow-s);
 }
 
+.cc-swatch--blue   { background: #5b8dee; }
+.cc-swatch--green  { background: #3ba55c; }
+.cc-swatch--red    { background: #ed4245; }
+.cc-swatch--yellow { background: #faa61a; }
+.cc-swatch--purple { background: #9b59b6; }
+.cc-swatch--teal   { background: #1abc9c; }
+
 .cc-settings-swatch:hover {
   transform: scale(1.15);
   box-shadow: var(--cc-shadow-m);

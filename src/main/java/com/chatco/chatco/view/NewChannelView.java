@@ -15,6 +15,7 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 
 import java.util.List;
+import java.util.Locale;
 
 /**
  * View for creating a new channel.
@@ -48,7 +49,7 @@ public class NewChannelView extends VerticalLayout {
         Button create = new Button("Create Channel");
         create.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         create.addClickListener(e -> {
-            String name = nameField.getValue().trim().toLowerCase().replace(" ", "-");
+            String name = nameField.getValue().trim().toLowerCase(Locale.ROOT).replaceAll("\\s+", "-");
             if (!name.isBlank()) {
                 var conv = conversationService.create(ConversationType.CHANNEL, name, List.of());
                 UI.getCurrent().navigate("conversation/" + conv.id());
