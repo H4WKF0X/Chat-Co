@@ -19,7 +19,7 @@ target/
 *.iws
 *.iml
 *.ipr
-Dokumentation/GUI_Plan.md
+docs/GUI_Plan.md
 
 ### NetBeans ###
 /nbproject/private/
@@ -34,6 +34,9 @@ build/
 ### VS Code ###
 .vscode/
 
+### Claude Code ###
+.claude
+
 ### Secret Properties ###
 src/main/resources/secret.properties
 
@@ -44,6 +47,7 @@ src/main/resources/secret.properties
 
 ### Vaadin generated ###
 src/main/frontend/generated/
+src/main/frontend/index.html
 src/main/bundles/
 vite.generated.ts
 vite.config.ts
