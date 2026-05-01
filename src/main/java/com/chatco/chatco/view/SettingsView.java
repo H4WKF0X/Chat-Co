@@ -1,6 +1,7 @@
 package com.chatco.chatco.view;
 
 import com.chatco.chatco.model.AppUser;
+import com.chatco.chatco.model.UserRole;
 import com.chatco.chatco.model.UserStatus;
 import com.chatco.chatco.service.UserService;
 import com.vaadin.flow.component.UI;
@@ -58,7 +59,7 @@ public class SettingsView extends VerticalLayout {
         Div profilePanel     = buildProfilePanel(user);
         Div appearancePanel  = buildAppearancePanel();
         Div notifPanel       = buildNotificationsPanel();
-        Div accountPanel     = buildAccountPanel();
+        Div accountPanel     = buildAccountPanel(user);
 
         content.add(profilePanel, appearancePanel, notifPanel, accountPanel);
 
@@ -95,6 +96,7 @@ public class SettingsView extends VerticalLayout {
 
         TextField displayName = new TextField("Display name");
         displayName.setValue(user.displayName());
+        displayName.setReadOnly(user.role() != UserRole.ADMINISTRATOR);
         displayName.setWidthFull();
 
         TextField username = new TextField("Username");
@@ -134,15 +136,29 @@ public class SettingsView extends VerticalLayout {
 
         Button darkBtn  = new Button("Dark");
         Button lightBtn = new Button("Light");
-        darkBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
+        darkBtn.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_SMALL);
         lightBtn.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_SMALL);
+
+        UI.getCurrent().getPage().executeJs("return localStorage.getItem('cc-theme')")
+                .then(String.class, saved -> {
+                    if ("light".equals(saved)) {
+                        lightBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+                    } else {
+                        darkBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+                    }
+                });
+
         darkBtn.addClickListener(e -> {
-            UI.getCurrent().getElement().setAttribute("theme", "dark");
+            UI.getCurrent().getPage().executeJs(
+                    "document.documentElement.setAttribute('theme','dark');" +
+                    "localStorage.setItem('cc-theme','dark')");
             darkBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
             lightBtn.removeThemeVariants(ButtonVariant.LUMO_PRIMARY);
         });
         lightBtn.addClickListener(e -> {
-            UI.getCurrent().getElement().setAttribute("theme", "");
+            UI.getCurrent().getPage().executeJs(
+                    "document.documentElement.removeAttribute('theme');" +
+                    "localStorage.setItem('cc-theme','light')");
             lightBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
             darkBtn.removeThemeVariants(ButtonVariant.LUMO_PRIMARY);
         });
@@ -187,19 +203,22 @@ public class SettingsView extends VerticalLayout {
         return row;
     }
 
-    private Div buildAccountPanel() {
+    private Div buildAccountPanel(AppUser user) {
         Div panel = new Div();
         panel.addClassName("cc-settings-panel");
 
         Button changePassword = new Button("Change Password");
         changePassword.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
         changePassword.addClickListener(e -> openChangePasswordDialog());
+        panel.add(changePassword);
 
-        Button deactivate = new Button("Deactivate Account");
-        deactivate.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_TERTIARY);
-        deactivate.addClickListener(e -> openDeactivateDialog());
+        if (user.role() == UserRole.ADMINISTRATOR) {
+            Button deactivate = new Button("Deactivate Account");
+            deactivate.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_TERTIARY);
+            deactivate.addClickListener(e -> openDeactivateDialog());
+            panel.add(deactivate);
+        }
 
-        panel.add(changePassword, deactivate);
         return panel;
     }
 

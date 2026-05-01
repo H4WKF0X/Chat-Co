@@ -93,9 +93,9 @@ public class ConversationView extends VerticalLayout implements BeforeEnterObser
         headerTitle.addClassName("cc-chat-header-title");
         headerMeta.addClassName("cc-chat-header-meta");
 
-        Button membersBtn = new Button("Members");
+        Button membersBtn = new Button("👥 Members");
         membersBtn.addClassName("cc-members-btn");
-        membersBtn.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE);
+        membersBtn.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_SMALL);
         membersBtn.addClickListener(e -> toggleMemberPanel());
 
         Div left  = new Div(headerIcon, headerTitle, headerMeta);
