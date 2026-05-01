@@ -109,17 +109,18 @@ public class AdminView extends VerticalLayout implements BeforeEnterObserver {
         toolbar.addClassName("cc-admin-toolbar");
 
         Grid<AppUser> grid = new Grid<>(AppUser.class, false);
-        grid.addColumn(AppUser::username).setHeader("Username").setSortable(true);
-        grid.addColumn(AppUser::displayName).setHeader("Display Name").setSortable(true);
-        grid.addColumn(AppUser::mail).setHeader("Email");
-        grid.addColumn(u -> u.role().name()).setHeader("Role").setSortable(true);
-        grid.addColumn(u -> u.status().name()).setHeader("Status").setSortable(true);
-        grid.addColumn(u -> u.createdAt().format(DATE_FMT)).setHeader("Created");
-        grid.addComponentColumn(u -> buildUserActions(u, grid)).setHeader("Actions").setFlexGrow(0).setWidth("140px");
+        grid.addColumn(AppUser::username).setHeader("Username").setSortable(true).setFlexGrow(2);
+        grid.addColumn(AppUser::displayName).setHeader("Display Name").setSortable(true).setFlexGrow(2);
+        grid.addColumn(AppUser::mail).setHeader("Email").setFlexGrow(3);
+        grid.addColumn(u -> u.role().name()).setHeader("Role").setSortable(true).setFlexGrow(1);
+        grid.addColumn(u -> u.status().name()).setHeader("Status").setSortable(true).setFlexGrow(1);
+        grid.addColumn(u -> u.createdAt().format(DATE_FMT)).setHeader("Created").setFlexGrow(1);
+        grid.addComponentColumn(u -> buildUserActions(u, grid)).setHeader("Actions").setFlexGrow(0).setWidth("160px");
 
         grid.setItems(userService.getAll());
         grid.addClassName("cc-admin-grid");
         grid.setAllRowsVisible(true);
+        grid.setWidthFull();
 
         panel.add(toolbar, grid);
         return panel;
@@ -127,7 +128,8 @@ public class AdminView extends VerticalLayout implements BeforeEnterObserver {
 
     private Div buildUserActions(AppUser user, Grid<AppUser> grid) {
         Button toggle = new Button(user.active() ? "Deactivate" : "Activate");
-        toggle.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_TERTIARY);
+        toggle.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_TERTIARY,
+                user.active() ? ButtonVariant.LUMO_ERROR : ButtonVariant.LUMO_SUCCESS);
         toggle.addClickListener(e -> toast((user.active() ? "Deactivated" : "Activated") + " " + user.displayName() + " (stub)", false));
 
         Button edit = new Button("Edit");
@@ -196,18 +198,26 @@ public class AdminView extends VerticalLayout implements BeforeEnterObserver {
         Div panel = new Div();
         panel.addClassName("cc-admin-panel");
 
+        Button newChannelBtn = new Button("New Channel");
+        newChannelBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
+        newChannelBtn.addClickListener(e -> UI.getCurrent().navigate("new-channel"));
+
+        Div toolbar = new Div(newChannelBtn);
+        toolbar.addClassName("cc-admin-toolbar");
+
         Grid<Conversation> grid = new Grid<>(Conversation.class, false);
-        grid.addColumn(Conversation::title).setHeader("Name").setSortable(true);
-        grid.addColumn(c -> c.type().name()).setHeader("Type").setSortable(true);
-        grid.addColumn(c -> c.creator().displayName()).setHeader("Created by");
-        grid.addColumn(c -> c.createdAt().format(DATE_FMT)).setHeader("Created");
-        grid.addComponentColumn(c -> buildChannelActions(c)).setHeader("Actions").setFlexGrow(0).setWidth("160px");
+        grid.addColumn(Conversation::title).setHeader("Name").setSortable(true).setFlexGrow(3);
+        grid.addColumn(c -> c.type().name()).setHeader("Type").setSortable(true).setFlexGrow(1);
+        grid.addColumn(c -> c.creator().displayName()).setHeader("Created by").setFlexGrow(2);
+        grid.addColumn(c -> c.createdAt().format(DATE_FMT)).setHeader("Created").setFlexGrow(1);
+        grid.addComponentColumn(this::buildChannelActions).setHeader("Actions").setFlexGrow(0).setWidth("160px");
 
         grid.setItems(conversationService.getAll());
         grid.addClassName("cc-admin-grid");
         grid.setAllRowsVisible(true);
+        grid.setWidthFull();
 
-        panel.add(grid);
+        panel.add(toolbar, grid);
         return panel;
     }
 

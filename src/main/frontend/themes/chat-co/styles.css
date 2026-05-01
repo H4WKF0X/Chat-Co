@@ -59,6 +59,66 @@ html {
 }
 
 /* ================================================================
+   Light theme overrides  (no theme="dark" attribute on <html>)
+   ================================================================ */
+html:not([theme~="dark"]) {
+  --cc-bg-app:      #e3e5e8;
+  --cc-bg-rail:     #dcdfe4;
+  --cc-bg-sidebar:  #f2f3f5;
+  --cc-bg-main:     #ffffff;
+  --cc-bg-surface:  #f2f3f5;
+  --cc-bg-hover:    #e8eaed;
+  --cc-bg-input:    #ebedef;
+
+  --cc-text-primary:   #060607;
+  --cc-text-secondary: #4f5660;
+  --cc-text-muted:     #8e9297;
+
+  --cc-accent:        #3d6fce;
+  --cc-accent-hover:  #2d5fbe;
+  --cc-accent-subtle: rgba(61, 111, 206, 0.12);
+
+  --cc-shadow-s:  0 1px  4px rgba(0, 0, 0, 0.10);
+  --cc-shadow-m:  0 3px 12px rgba(0, 0, 0, 0.15);
+  --cc-shadow-l:  0 6px 24px rgba(0, 0, 0, 0.22);
+
+  --lumo-base-color:            var(--cc-bg-main);
+  --lumo-body-text-color:       var(--cc-text-primary);
+  --lumo-secondary-text-color:  var(--cc-text-secondary);
+  --lumo-disabled-text-color:   var(--cc-text-muted);
+  --lumo-primary-color:         var(--cc-accent);
+  --lumo-primary-text-color:    var(--cc-accent);
+  --lumo-primary-color-50pct:   rgba(61, 111, 206, 0.5);
+  --lumo-primary-color-10pct:   rgba(61, 111, 206, 0.1);
+  --lumo-contrast-5pct:         rgba(0, 0, 0, 0.05);
+  --lumo-contrast-10pct:        rgba(0, 0, 0, 0.10);
+  --lumo-contrast-20pct:        rgba(0, 0, 0, 0.20);
+  --lumo-contrast-50pct:        rgba(0, 0, 0, 0.50);
+  --lumo-contrast-90pct:        rgba(0, 0, 0, 0.90);
+}
+
+/* Fix hardcoded rgba(255,255,255,X) borders and overlays in light mode */
+html:not([theme~="dark"]) .cc-workspace-header              { border-bottom-color: rgba(0,0,0,0.08); }
+html:not([theme~="dark"]) .cc-user-footer                   { border-top-color: rgba(0,0,0,0.08); background: rgba(0,0,0,0.04); }
+html:not([theme~="dark"]) .cc-user-footer:hover             { background: rgba(0,0,0,0.09); }
+html:not([theme~="dark"]) .cc-chat-header                   { border-bottom-color: rgba(0,0,0,0.08); }
+html:not([theme~="dark"]) .cc-message-input-bar             { border-top-color: rgba(0,0,0,0.08); }
+html:not([theme~="dark"]) .cc-reply-bar                     { border-bottom-color: rgba(0,0,0,0.08); }
+html:not([theme~="dark"]) .cc-member-panel                  { border-left-color: rgba(0,0,0,0.08); }
+html:not([theme~="dark"]) .cc-member-panel-header           { border-bottom-color: rgba(0,0,0,0.08); }
+html:not([theme~="dark"]) .cc-settings-tabs                 { border-bottom-color: rgba(0,0,0,0.08); }
+html:not([theme~="dark"]) .cc-settings-toggle-row           { border-bottom-color: rgba(0,0,0,0.08); }
+html:not([theme~="dark"]) .cc-detail-footer                 { border-top-color: rgba(0,0,0,0.08); }
+html:not([theme~="dark"]) .cc-date-separator::before,
+html:not([theme~="dark"]) .cc-date-separator::after         { background: rgba(0,0,0,0.10); }
+html:not([theme~="dark"]) .cc-msg-row:hover                 { background: rgba(0,0,0,0.03); }
+html:not([theme~="dark"]) .cc-msg-reply-strip               { background: rgba(0,0,0,0.05); }
+html:not([theme~="dark"]) .cc-msg-row--own .cc-msg-bubble   { background: rgba(61,111,206,0.08); }
+html:not([theme~="dark"]) .cc-sidebar-scroll::-webkit-scrollbar-thumb          { background: rgba(0,0,0,0.15); }
+html:not([theme~="dark"]) .cc-message-list-wrapper::-webkit-scrollbar-thumb    { background: rgba(0,0,0,0.15); }
+html:not([theme~="dark"]) .cc-admin-logs                    { background: #f0f0f2; }
+
+/* ================================================================
    Viewport & body
    ================================================================ */
 html, body {
@@ -474,7 +534,6 @@ body > div {
 
 .cc-members-btn {
   font-size: 12px !important;
-  color: var(--cc-text-secondary) !important;
 }
 
 /* ================================================================
@@ -1151,6 +1210,8 @@ body > div {
   padding: 16px 28px;
   overflow-y: auto;
   flex: 1;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .cc-admin-panel {

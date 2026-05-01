@@ -54,6 +54,10 @@ public class MainLayout extends HorizontalLayout implements RouterLayout, AfterN
 
         add(buildRail(isAdmin), sidebar, contentArea);
         expand(contentArea);
+
+        UI.getCurrent().getPage().executeJs(
+                "if(localStorage.getItem('cc-theme')!=='light')" +
+                "{document.documentElement.setAttribute('theme','dark')}");
     }
 
     private Div buildRail(boolean isAdmin) {
@@ -108,7 +112,7 @@ public class MainLayout extends HorizontalLayout implements RouterLayout, AfterN
             railAdmin.addClassName("cc-rail-btn--active");
         }
 
-        boolean showSidebar = !path.startsWith("meetings") && !path.startsWith("admin");
+        boolean showSidebar = !path.startsWith("meetings") && !path.startsWith("admin") && !path.startsWith("settings");
         sidebar.setVisible(showSidebar);
 
         if (path.startsWith("conversation/")) {
