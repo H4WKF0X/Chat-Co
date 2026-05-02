@@ -35,6 +35,18 @@ public class StubUserService implements UserService {
 
     @Override
     public AppUser getCurrentUser() {
-        return store.MAX;
+        return findById(store.MAX.id()).orElse(store.MAX);
+    }
+
+    @Override
+    public void updateUser(AppUser updated) {
+        synchronized (store.allUsers) {
+            for (int i = 0; i < store.allUsers.size(); i++) {
+                if (store.allUsers.get(i).id().equals(updated.id())) {
+                    store.allUsers.set(i, updated);
+                    return;
+                }
+            }
+        }
     }
 }

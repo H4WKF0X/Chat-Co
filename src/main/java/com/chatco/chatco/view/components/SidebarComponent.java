@@ -116,6 +116,10 @@ public class SidebarComponent extends VerticalLayout {
         Div footer = new Div();
         footer.addClassName("cc-user-footer");
         footer.addClickListener(e -> UI.getCurrent().navigate("settings"));
+        footer.getElement().setAttribute("role", "button");
+        footer.getElement().setAttribute("tabindex", "0");
+        footer.getElement().addEventListener("keydown", e -> UI.getCurrent().navigate("settings"))
+                .setFilter("event.key === 'Enter' || event.key === ' '");
 
         Avatar avatar = new Avatar(user.displayName());
         avatar.setWidth("32px");

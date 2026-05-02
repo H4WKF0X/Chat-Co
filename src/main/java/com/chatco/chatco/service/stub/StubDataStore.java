@@ -57,8 +57,9 @@ public class StubDataStore {
 
     final Map<Long, List<MeetingParticipant>> participantsByMeeting;
 
-    private final AtomicLong messageIdSeq = new AtomicLong(100);
-    private final AtomicLong meetingIdSeq = new AtomicLong(10);
+    private final AtomicLong messageIdSeq      = new AtomicLong(100);
+    private final AtomicLong meetingIdSeq      = new AtomicLong(10);
+    private final AtomicLong conversationIdSeq = new AtomicLong(8);
 
     public StubDataStore() {
         OffsetDateTime base = OffsetDateTime.now().minusMonths(2);
@@ -68,7 +69,7 @@ public class StubDataStore {
         SEBASTIAN = new AppUser(3L, "sebastian.weigl", "Sebastian Weigl", "sebastian@chatco.local", true, UserStatus.AWAY,     UserRole.MITARBEITER,   base.plusDays(5));
         LAURA     = new AppUser(4L, "laura.fischer",   "Laura Fischer",   "laura@chatco.local",     true, UserStatus.ACTIVE,   UserRole.MITARBEITER,   base.plusWeeks(2));
         TOM       = new AppUser(5L, "tom.becker",      "Tom Becker",      "tom@chatco.local",       false, UserStatus.INACTIVE, UserRole.GAST,          base.plusWeeks(4));
-        allUsers  = List.of(MAX, ALEX, SEBASTIAN, LAURA, TOM);
+        allUsers  = Collections.synchronizedList(new ArrayList<>(List.of(MAX, ALEX, SEBASTIAN, LAURA, TOM)));
 
         GENERAL            = new Conversation(1L, ConversationType.CHANNEL, "general",          ALEX, base);
         DEV_TALK           = new Conversation(2L, ConversationType.CHANNEL, "dev-talk",         MAX,  base);
@@ -139,8 +140,9 @@ public class StubDataStore {
         ))));
     }
 
-    public AtomicLong getMessageIdSeq() { return messageIdSeq; }
-    public AtomicLong getMeetingIdSeq() { return meetingIdSeq; }
+    public AtomicLong getMessageIdSeq()      { return messageIdSeq; }
+    public AtomicLong getMeetingIdSeq()      { return meetingIdSeq; }
+    public AtomicLong getConversationIdSeq() { return conversationIdSeq; }
 
     private List<Message> generalMessages() {
         OffsetDateTime d = OffsetDateTime.now().minusDays(2);

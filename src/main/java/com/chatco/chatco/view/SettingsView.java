@@ -56,7 +56,7 @@ public class SettingsView extends VerticalLayout {
         Div content = new Div();
         content.addClassName("cc-settings-content");
 
-        Div profilePanel     = buildProfilePanel(user);
+        Div profilePanel     = buildProfilePanel(user, userService);
         Div appearancePanel  = buildAppearancePanel();
         Div notifPanel       = buildNotificationsPanel();
         Div accountPanel     = buildAccountPanel(user);
@@ -79,7 +79,7 @@ public class SettingsView extends VerticalLayout {
         expand(content);
     }
 
-    private Div buildProfilePanel(AppUser user) {
+    private Div buildProfilePanel(AppUser user, UserService userService) {
         Div panel = new Div();
         panel.addClassName("cc-settings-panel");
 
@@ -121,7 +121,12 @@ public class SettingsView extends VerticalLayout {
 
         Button save = new Button("Save changes");
         save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        save.addClickListener(e -> toast("Profile saved (stub)", true));
+        save.addClickListener(e -> {
+            userService.updateUser(new AppUser(
+                    user.id(), user.username(), displayName.getValue().trim(), user.mail(),
+                    user.active(), statusBox.getValue(), user.role(), user.createdAt()));
+            toast("Profile saved", true);
+        });
 
         panel.add(avatarRow, displayName, username, email, statusBox, save);
         return panel;

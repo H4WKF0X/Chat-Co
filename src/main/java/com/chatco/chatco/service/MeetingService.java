@@ -71,4 +71,10 @@ public interface MeetingService {
      * @param status    the new status (ACCEPTED or DECLINED)
      */
     void updateParticipantStatus(Long meetingId, Long userId, ParticipantStatus status);
+
+    /**
+     * Returns true if the given room has no overlapping bookings in the specified window.
+     * Always returns true when room is null (remote/no-room meetings).
+     */
+    boolean isRoomAvailable(Room room, OffsetDateTime startAt, OffsetDateTime endAt);
 }
