@@ -2,44 +2,38 @@ package com.chatco.chatco.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.ldap.core.support.BaseLdapPathContextSource;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.ldap.LdapBindAuthenticationManagerFactory;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.ldap.userdetails.UserDetailsContextMapper;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-@EnableWebSecurity
 @Configuration
+@EnableWebSecurity
 public class SecurityConfig {
 
-    @Bean
-    AuthenticationManager authenticationManager(
-            BaseLdapPathContextSource contextSource,
-            LdapToDbUserMapper ldapToDbUserMapper
-    ) {
-        LdapBindAuthenticationManagerFactory factory =
-                new LdapBindAuthenticationManagerFactory(contextSource);
+    private final JwtFilter jwtFilter;
 
-        factory.setUserSearchBase("ou=people");
-        factory.setUserSearchFilter("(uid={0})");
-        factory.setUserDetailsContextMapper(ldapToDbUserMapper);
-
-        return factory.createAuthenticationManager();
+    public SecurityConfig(JwtFilter jwtFilter) {
+        this.jwtFilter = jwtFilter;
     }
 
     @Bean
-    SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        return http
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login").permitAll()
-                        .requestMatchers("/").permitAll()
-                        .anyRequest().authenticated()
-                )
-                .formLogin(Customizer.withDefaults())
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
                 .csrf(csrf -> csrf.disable())
-                .build();
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/auth/**").permitAll()  // ← Login offen
+                        .requestMatchers("/api/**").authenticated()   // ← Rest braucht JWT
+                        .anyRequest().permitAll()                     // ← Vaadin UI offen
+                )
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                // ← Kein formLogin, kein httpBasic → kein HTML-Redirect
+                .formLogin(form -> form.disable())
+                .httpBasic(basic -> basic.disable());
+
+        return http.build();
     }
 }

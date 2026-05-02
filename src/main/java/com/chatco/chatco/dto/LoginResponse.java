@@ -4,6 +4,6 @@ public record LoginResponse(
         boolean success,
         String username,
         String displayName,
-        String mail
-) {
-}
+        String mail,
+        String token        // ← NEU: JWT-Token für die iOS App
+) {}
