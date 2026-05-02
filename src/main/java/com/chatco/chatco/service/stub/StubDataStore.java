@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.OffsetDateTime;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -77,9 +78,9 @@ public class StubDataStore {
         GROUP_ALPHA        = new Conversation(6L, ConversationType.GROUP,   "Project Alpha",    MAX,  base.plusWeeks(2));
         MEETING_SPRINT     = new Conversation(7L, ConversationType.GROUP,   "Sprint Review",    ALEX, base.plusWeeks(3));
         MEETING_ONBOARDING = new Conversation(8L, ConversationType.GROUP,   "Onboarding Session", MAX, base.plusWeeks(5));
-        allConversations   = new ArrayList<>(List.of(GENERAL, DEV_TALK, ANNOUNCEMENTS, DM_ALEX, DM_SEBASTIAN, GROUP_ALPHA, MEETING_SPRINT, MEETING_ONBOARDING));
+        allConversations   = Collections.synchronizedList(new ArrayList<>(List.of(GENERAL, DEV_TALK, ANNOUNCEMENTS, DM_ALEX, DM_SEBASTIAN, GROUP_ALPHA, MEETING_SPRINT, MEETING_ONBOARDING)));
 
-        membersByConversation = new HashMap<>();
+        membersByConversation = new ConcurrentHashMap<>();
         membersByConversation.put(1L, List.of(MAX, ALEX, SEBASTIAN, LAURA, TOM));
         membersByConversation.put(2L, List.of(MAX, ALEX, SEBASTIAN));
         membersByConversation.put(3L, List.of(MAX, ALEX, SEBASTIAN, LAURA, TOM));
@@ -89,15 +90,15 @@ public class StubDataStore {
         membersByConversation.put(7L, List.of(MAX, ALEX, SEBASTIAN, LAURA));
         membersByConversation.put(8L, List.of(MAX, ALEX, LAURA, TOM));
 
-        messagesByConversation = new HashMap<>();
+        messagesByConversation = new ConcurrentHashMap<>();
         messagesByConversation.put(1L, generalMessages());
         messagesByConversation.put(2L, devTalkMessages());
         messagesByConversation.put(3L, announcementsMessages());
         messagesByConversation.put(4L, dmAlexMessages());
         messagesByConversation.put(5L, dmSebastianMessages());
         messagesByConversation.put(6L, groupAlphaMessages());
-        messagesByConversation.put(7L, new ArrayList<>());
-        messagesByConversation.put(8L, new ArrayList<>());
+        messagesByConversation.put(7L, Collections.synchronizedList(new ArrayList<>()));
+        messagesByConversation.put(8L, Collections.synchronizedList(new ArrayList<>()));
 
         ROOM_A = new Room(1L, "Konferenzraum A", 10, "EG, Raum 101");
         ROOM_B = new Room(2L, "Besprechungsraum B", 4, "1. OG, Raum 212");
@@ -109,33 +110,33 @@ public class StubDataStore {
         MEETING_ONBOARDING_SESSION = new Meeting(2L, "Onboarding Session",   "Einführung neuer Mitarbeiter",              now.plusDays(3).withHour(10).withMinute(0).withSecond(0).withNano(0),  now.plusDays(3).withHour(11).withMinute(0).withSecond(0).withNano(0),  null,                   ROOM_B, MEETING_ONBOARDING);
         MEETING_ARCH_DISCUSSION  = new Meeting(3L, "Architecture Discussion", "WebSocket vs. SSE für Chat-Modul",         now.plusDays(5).withHour(9).withMinute(30).withSecond(0).withNano(0), now.plusDays(5).withHour(10).withMinute(30).withSecond(0).withNano(0), null,                   null,   DEV_TALK);
         MEETING_TEAM_LUNCH       = new Meeting(4L, "Team Lunch",              "Monatliches Team-Mittagessen",             now.minusDays(2).withHour(12).withMinute(0).withSecond(0).withNano(0), now.minusDays(2).withHour(13).withMinute(0).withSecond(0).withNano(0), "Kantine, EG",         null,   GENERAL);
-        allMeetings = new ArrayList<>(List.of(MEETING_SPRINT_REVIEW, MEETING_ONBOARDING_SESSION, MEETING_ARCH_DISCUSSION, MEETING_TEAM_LUNCH));
+        allMeetings = Collections.synchronizedList(new ArrayList<>(List.of(MEETING_SPRINT_REVIEW, MEETING_ONBOARDING_SESSION, MEETING_ARCH_DISCUSSION, MEETING_TEAM_LUNCH)));
 
-        participantsByMeeting = new HashMap<>();
-        participantsByMeeting.put(1L, new ArrayList<>(List.of(
+        participantsByMeeting = new ConcurrentHashMap<>();
+        participantsByMeeting.put(1L, Collections.synchronizedList(new ArrayList<>(List.of(
                 new MeetingParticipant(MEETING_SPRINT_REVIEW, MAX,       ParticipantStatus.ACCEPTED),
                 new MeetingParticipant(MEETING_SPRINT_REVIEW, ALEX,      ParticipantStatus.ACCEPTED),
                 new MeetingParticipant(MEETING_SPRINT_REVIEW, SEBASTIAN, ParticipantStatus.ACCEPTED),
                 new MeetingParticipant(MEETING_SPRINT_REVIEW, LAURA,     ParticipantStatus.INVITED)
-        )));
-        participantsByMeeting.put(2L, new ArrayList<>(List.of(
+        ))));
+        participantsByMeeting.put(2L, Collections.synchronizedList(new ArrayList<>(List.of(
                 new MeetingParticipant(MEETING_ONBOARDING_SESSION, MAX,   ParticipantStatus.ACCEPTED),
                 new MeetingParticipant(MEETING_ONBOARDING_SESSION, ALEX,  ParticipantStatus.ACCEPTED),
                 new MeetingParticipant(MEETING_ONBOARDING_SESSION, LAURA, ParticipantStatus.INVITED),
                 new MeetingParticipant(MEETING_ONBOARDING_SESSION, TOM,   ParticipantStatus.DECLINED)
-        )));
-        participantsByMeeting.put(3L, new ArrayList<>(List.of(
+        ))));
+        participantsByMeeting.put(3L, Collections.synchronizedList(new ArrayList<>(List.of(
                 new MeetingParticipant(MEETING_ARCH_DISCUSSION, MAX,       ParticipantStatus.ACCEPTED),
                 new MeetingParticipant(MEETING_ARCH_DISCUSSION, ALEX,      ParticipantStatus.INVITED),
                 new MeetingParticipant(MEETING_ARCH_DISCUSSION, SEBASTIAN, ParticipantStatus.INVITED)
-        )));
-        participantsByMeeting.put(4L, new ArrayList<>(List.of(
+        ))));
+        participantsByMeeting.put(4L, Collections.synchronizedList(new ArrayList<>(List.of(
                 new MeetingParticipant(MEETING_TEAM_LUNCH, MAX,       ParticipantStatus.ACCEPTED),
                 new MeetingParticipant(MEETING_TEAM_LUNCH, ALEX,      ParticipantStatus.ACCEPTED),
                 new MeetingParticipant(MEETING_TEAM_LUNCH, SEBASTIAN, ParticipantStatus.ACCEPTED),
                 new MeetingParticipant(MEETING_TEAM_LUNCH, LAURA,     ParticipantStatus.ACCEPTED),
                 new MeetingParticipant(MEETING_TEAM_LUNCH, TOM,       ParticipantStatus.DECLINED)
-        )));
+        ))));
     }
 
     public AtomicLong getMessageIdSeq() { return messageIdSeq; }
@@ -154,7 +155,7 @@ public class StubDataStore {
         m.add(new Message(17L, "Reminder: new onboarding docs are in the shared drive.",             MessageType.TEXT, d.plusDays(1).withHour(8).withMinute(45),  null, ALEX,  GENERAL, null));
         m.add(new Message(18L, "Thanks, very helpful for the new members!",                          MessageType.TEXT, d.plusDays(1).withHour(9).withMinute(2),   null, LAURA, GENERAL, null));
         m.add(new Message(19L, "Also pushed a fix for the LDAP connection issue — please pull.",     MessageType.TEXT, d.plusDays(1).withHour(11).withMinute(30), null, MAX,   GENERAL, null));
-        return new ArrayList<>(m);
+        return Collections.synchronizedList(new ArrayList<>(m));
     }
 
     private List<Message> devTalkMessages() {
@@ -166,7 +167,7 @@ public class StubDataStore {
         m.add(new Message(23L, "Makes sense. Did you add a CHECK constraint at the DB level?",       MessageType.TEXT, d.withHour(10).withMinute(30), null, ALEX,      DEV_TALK, null));
         m.add(new Message(24L, "Yes, already in the CREATE script around line 38.",                  MessageType.TEXT, d.withHour(10).withMinute(33), null, MAX,       DEV_TALK, m.get(3)));
         m.add(new Message(25L, "👍 Perfect.",                                                        MessageType.TEXT, d.withHour(10).withMinute(35), null, ALEX,      DEV_TALK, null));
-        return new ArrayList<>(m);
+        return Collections.synchronizedList(new ArrayList<>(m));
     }
 
     private List<Message> announcementsMessages() {
@@ -174,7 +175,7 @@ public class StubDataStore {
         List<Message> m = new ArrayList<>();
         m.add(new Message(30L, "Welcome to Chat-Co! This channel is for official announcements only.", MessageType.TEXT, d,              null, ALEX, ANNOUNCEMENTS, null));
         m.add(new Message(31L, "Sprint 1 review scheduled for Thursday 14:00. Link in your calendar.", MessageType.TEXT, d.plusDays(5),  null, ALEX, ANNOUNCEMENTS, null));
-        return new ArrayList<>(m);
+        return Collections.synchronizedList(new ArrayList<>(m));
     }
 
     private List<Message> dmAlexMessages() {
@@ -185,7 +186,7 @@ public class StubDataStore {
         m.add(new Message(42L, "Great! Let me know if you need any input on the design direction.",  MessageType.TEXT, d.plusMinutes(7),  null, ALEX, DM_ALEX, null));
         m.add(new Message(43L, "Will do. I'm going for a Discord-inspired dark theme.",              MessageType.TEXT, d.plusMinutes(10), null, MAX,  DM_ALEX, null));
         m.add(new Message(44L, "Sounds clean. Looking forward to it! 🔥",                           MessageType.TEXT, d.plusMinutes(12), null, ALEX, DM_ALEX, null));
-        return new ArrayList<>(m);
+        return Collections.synchronizedList(new ArrayList<>(m));
     }
 
     private List<Message> dmSebastianMessages() {
@@ -194,7 +195,7 @@ public class StubDataStore {
         m.add(new Message(50L, "Sebastian, did you get the test DB running locally?",                MessageType.TEXT, d.withHour(14).withMinute(0),  null, MAX,       DM_SEBASTIAN, null));
         m.add(new Message(51L, "Yeah, finally! Had to update the Docker Compose file — port conflict.", MessageType.TEXT, d.withHour(14).withMinute(8),  null, SEBASTIAN, DM_SEBASTIAN, null));
         m.add(new Message(52L, "Good catch. I'll push that fix to the repo.",                        MessageType.TEXT, d.withHour(14).withMinute(10), null, MAX,       DM_SEBASTIAN, null));
-        return new ArrayList<>(m);
+        return Collections.synchronizedList(new ArrayList<>(m));
     }
 
     private List<Message> groupAlphaMessages() {
@@ -204,6 +205,6 @@ public class StubDataStore {
         m.add(new Message(61L, "Thanks for setting this up. Initial task list is in the shared drive.", MessageType.TEXT, d.plusHours(1), null, ALEX,      GROUP_ALPHA, null));
         m.add(new Message(62L, "I'll start on the WebSocket integration this week.",                   MessageType.TEXT, d.plusHours(2), null, SEBASTIAN, GROUP_ALPHA, null));
         m.add(new Message(63L, "Perfect. Let's aim for a first working end-to-end test by Friday.",   MessageType.TEXT, d.plusHours(3), null, MAX,       GROUP_ALPHA, null));
-        return new ArrayList<>(m);
+        return Collections.synchronizedList(new ArrayList<>(m));
     }
 }

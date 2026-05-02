@@ -84,9 +84,14 @@ public class MainLayout extends HorizontalLayout implements RouterLayout, AfterN
         Div btn = new Div();
         btn.addClassName("cc-rail-btn");
         btn.getElement().setAttribute("title", tooltip);
+        btn.getElement().setAttribute("role", "button");
+        btn.getElement().setAttribute("tabindex", "0");
+        btn.getElement().setAttribute("aria-label", tooltip);
         Span iconSpan = new Span(icon);
         btn.add(iconSpan);
         btn.addClickListener(e -> onClick.run());
+        btn.getElement().addEventListener("keydown", e -> onClick.run())
+                .setFilter("event.key === 'Enter' || event.key === ' '");
         return btn;
     }
 
