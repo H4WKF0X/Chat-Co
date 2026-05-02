@@ -69,7 +69,12 @@ public class SidebarComponent extends VerticalLayout {
         Span addBtn = new Span("+");
         addBtn.addClassName("cc-sidebar-add-btn");
         addBtn.getElement().setAttribute("title", "New");
+        addBtn.getElement().setAttribute("role", "button");
+        addBtn.getElement().setAttribute("tabindex", "0");
+        addBtn.getElement().setAttribute("aria-label", "New");
         addBtn.addClickListener(e -> UI.getCurrent().navigate(addRoute));
+        addBtn.getElement().addEventListener("keydown", e -> UI.getCurrent().navigate(addRoute))
+                .setFilter("event.key === 'Enter' || event.key === ' '");
 
         Div header = new Div(titleSpan, addBtn);
         header.addClassName("cc-sidebar-section-title");
