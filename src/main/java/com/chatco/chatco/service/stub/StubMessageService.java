@@ -54,7 +54,7 @@ public class StubMessageService implements MessageService {
         for (int i = 0; i < messages.size(); i++) {
             Message m = messages.get(i);
             if (m.id().equals(messageId)) {
-                messages.set(i, new Message(m.id(), newContent, m.messageType(), m.sentAt(), null, m.sender(), m.conversation(), m.replyTo()));
+                messages.set(i, new Message(m.id(), newContent, m.messageType(), m.sentAt(), m.deletedAt(), m.sender(), m.conversation(), m.replyTo()));
                 break;
             }
         }
@@ -85,7 +85,7 @@ public class StubMessageService implements MessageService {
                 replyTo
         );
         store.messagesByConversation
-                .computeIfAbsent(conversationId, id -> new java.util.ArrayList<>())
+                .computeIfAbsent(conversationId, id -> Collections.synchronizedList(new java.util.ArrayList<>()))
                 .add(message);
         return message;
     }

@@ -41,11 +41,23 @@ public class StubMeetingService implements MeetingService {
 
     @Override
     public List<Meeting> getByUser(Long userId) {
-        return store.allMeetings.stream()
-                .filter(m -> store.participantsByMeeting
-                        .getOrDefault(m.id(), Collections.emptyList())
-                        .stream().anyMatch(p -> p.user().id().equals(userId)))
-                .toList();
+        synchronized (store.allMeetings) {
+            return store.allMeetings.stream()
+                    .filter(m -> store.participantsByMeeting
+                            .getOrDefault(m.id(), Collections.emptyList())
+                            .stream().anyMatch(p -> p.user().id().equals(userId)))
+                    .toList();
+        }
+    }
+
+    @Override
+    public boolean isRoomAvailable(Room room, OffsetDateTime startAt, OffsetDateTime endAt) {
+        if (room == null) return true;
+        synchronized (store.allMeetings) {
+            return store.allMeetings.stream()
+                    .filter(m -> room.equals(m.room()))
+                    .noneMatch(m -> startAt.isBefore(m.endAt()) && endAt.isAfter(m.startAt()));
+        }
     }
 
     @Override
@@ -57,12 +69,12 @@ public class StubMeetingService implements MeetingService {
     public Meeting create(String title, String description, OffsetDateTime startAt, OffsetDateTime endAt,
                           String locationOrLink, Room room, List<Long> participantUserIds) {
         AppUser organiser = userService.getCurrentUser();
-        long convId = store.allConversations.stream().mapToLong(Conversation::id).max().orElse(0) + 1;
+        long convId = store.getConversationIdSeq().incrementAndGet();
         Conversation conv = new Conversation(convId, ConversationType.GROUP, title, organiser, OffsetDateTime.now());
         store.allConversations.add(conv);
-        store.messagesByConversation.put(convId, new ArrayList<>());
+        store.messagesByConversation.put(convId, Collections.synchronizedList(new ArrayList<>()));
 
-        List<AppUser> convMembers = new ArrayList<>();
+        List<AppUser> convMembers = Collections.synchronizedList(new ArrayList<>());
         convMembers.add(organiser);
         for (Long uid : participantUserIds) {
             if (!uid.equals(organiser.id())) {
@@ -77,7 +89,7 @@ public class StubMeetingService implements MeetingService {
         );
         store.allMeetings.add(meeting);
 
-        List<MeetingParticipant> participants = new ArrayList<>();
+        List<MeetingParticipant> participants = Collections.synchronizedList(new ArrayList<>());
         participants.add(new MeetingParticipant(meeting, organiser, ParticipantStatus.ACCEPTED));
         for (Long uid : participantUserIds) {
             if (!uid.equals(organiser.id())) {

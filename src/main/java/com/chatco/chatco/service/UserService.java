@@ -31,4 +31,11 @@ public interface UserService {
      * Spring Security principal lookup when authentication is wired up.
      */
     AppUser getCurrentUser();
+
+    /**
+     * Replaces the stored record for the user with the same ID.
+     * Used by settings and admin views to persist display name, status, role,
+     * and active-flag changes within the current session.
+     */
+    void updateUser(AppUser updated);
 }

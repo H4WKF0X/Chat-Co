@@ -343,12 +343,22 @@ public class MeetingsView extends VerticalLayout {
                 titleField.setInvalid(true);
                 return;
             }
+            LocalDateTime startVal = startPicker.getValue();
+            LocalDateTime endVal   = endPicker.getValue();
+            if (startVal == null) { startPicker.setInvalid(true); return; }
+            if (endVal == null)   { endPicker.setInvalid(true);   return; }
             ZoneId zone = ZoneId.systemDefault();
-            OffsetDateTime start = startPicker.getValue().atZone(zone).toOffsetDateTime();
-            OffsetDateTime end   = endPicker.getValue().atZone(zone).toOffsetDateTime();
+            OffsetDateTime start = startVal.atZone(zone).toOffsetDateTime();
+            OffsetDateTime end   = endVal.atZone(zone).toOffsetDateTime();
             if (!end.isAfter(start)) {
                 endPicker.setInvalid(true);
                 endPicker.setErrorMessage("End time must be after start time");
+                return;
+            }
+            Room selectedRoom = roomBox.getValue();
+            if (!meetingService.isRoomAvailable(selectedRoom, start, end)) {
+                roomBox.setInvalid(true);
+                roomBox.setErrorMessage("Room already booked for this time slot");
                 return;
             }
             List<Long> ids = participantBox.getValue().stream().map(AppUser::id).toList();
@@ -357,7 +367,7 @@ public class MeetingsView extends VerticalLayout {
                     descField.getValue().trim(),
                     start, end,
                     locationField.getValue().trim().isEmpty() ? null : locationField.getValue().trim(),
-                    roomBox.getValue(),
+                    selectedRoom,
                     ids
             );
             buildMeetingsList();

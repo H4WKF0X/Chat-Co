@@ -130,11 +130,17 @@ public class AdminView extends VerticalLayout implements BeforeEnterObserver {
         Button toggle = new Button(user.active() ? "Deactivate" : "Activate");
         toggle.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_TERTIARY,
                 user.active() ? ButtonVariant.LUMO_ERROR : ButtonVariant.LUMO_SUCCESS);
-        toggle.addClickListener(e -> toast((user.active() ? "Deactivated" : "Activated") + " " + user.displayName() + " (stub)", false));
+        toggle.addClickListener(e -> {
+            userService.updateUser(new AppUser(
+                    user.id(), user.username(), user.displayName(), user.mail(),
+                    !user.active(), user.status(), user.role(), user.createdAt()));
+            grid.setItems(userService.getAll());
+            toast((user.active() ? "Deactivated" : "Activated") + " " + user.displayName(), true);
+        });
 
         Button edit = new Button("Edit");
         edit.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_TERTIARY);
-        edit.addClickListener(e -> openEditUserDialog(user));
+        edit.addClickListener(e -> openEditUserDialog(user, grid));
 
         Div actions = new Div(toggle, edit);
         actions.addClassName("cc-admin-row-actions");
@@ -168,7 +174,7 @@ public class AdminView extends VerticalLayout implements BeforeEnterObserver {
         dialog.open();
     }
 
-    private void openEditUserDialog(AppUser user) {
+    private void openEditUserDialog(AppUser user, Grid<AppUser> grid) {
         Dialog dialog = new Dialog();
         dialog.setHeaderTitle("Edit: " + user.displayName());
 
@@ -183,7 +189,11 @@ public class AdminView extends VerticalLayout implements BeforeEnterObserver {
         status.setWidthFull();
 
         Button save = new Button("Save", e -> {
-            toast("Changes saved (stub)", true);
+            userService.updateUser(new AppUser(
+                    user.id(), user.username(), user.displayName(), user.mail(),
+                    user.active(), status.getValue(), role.getValue(), user.createdAt()));
+            grid.setItems(userService.getAll());
+            toast("Changes saved", true);
             dialog.close();
         });
         save.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
@@ -212,7 +222,7 @@ public class AdminView extends VerticalLayout implements BeforeEnterObserver {
         grid.addColumn(c -> c.createdAt().format(DATE_FMT)).setHeader("Created").setFlexGrow(1);
         grid.addComponentColumn(this::buildChannelActions).setHeader("Actions").setFlexGrow(0).setWidth("160px");
 
-        grid.setItems(conversationService.getAll());
+        grid.setItems(conversationService.getByType(ConversationType.CHANNEL));
         grid.addClassName("cc-admin-grid");
         grid.setAllRowsVisible(true);
         grid.setWidthFull();

@@ -35,16 +35,20 @@ public class StubConversationService implements ConversationService {
 
     @Override
     public List<Conversation> getByType(ConversationType type) {
-        return store.allConversations.stream()
-                .filter(c -> c.type() == type)
-                .toList();
+        synchronized (store.allConversations) {
+            return store.allConversations.stream()
+                    .filter(c -> c.type() == type)
+                    .toList();
+        }
     }
 
     @Override
     public Optional<Conversation> findById(Long id) {
-        return store.allConversations.stream()
-                .filter(c -> c.id().equals(id))
-                .findFirst();
+        synchronized (store.allConversations) {
+            return store.allConversations.stream()
+                    .filter(c -> c.id().equals(id))
+                    .findFirst();
+        }
     }
 
     @Override
@@ -54,12 +58,12 @@ public class StubConversationService implements ConversationService {
 
     @Override
     public Conversation create(ConversationType type, String title, List<Long> memberUserIds) {
-        long newId = store.allConversations.stream().mapToLong(Conversation::id).max().orElse(0) + 1;
+        long newId = store.getConversationIdSeq().incrementAndGet();
         AppUser creator = userService.getCurrentUser();
         Conversation conv = new Conversation(newId, type, title, creator, OffsetDateTime.now());
         store.allConversations.add(conv);
 
-        List<AppUser> members = new ArrayList<>();
+        List<AppUser> members = Collections.synchronizedList(new ArrayList<>());
         members.add(creator);
         for (Long uid : memberUserIds) {
             if (!uid.equals(creator.id())) {
@@ -67,7 +71,7 @@ public class StubConversationService implements ConversationService {
             }
         }
         store.membersByConversation.put(newId, members);
-        store.messagesByConversation.put(newId, new ArrayList<>());
+        store.messagesByConversation.put(newId, Collections.synchronizedList(new ArrayList<>()));
         return conv;
     }
 }
