@@ -46,11 +46,21 @@ public interface ConversationService {
      *
      * <p>The current user is always added as creator and member, even if not
      * included in {@code memberUserIds}.
+     * For {@link ConversationType#DIRECT} conversations, returns the existing DM if
+     * one already exists between the same pair of users instead of creating a duplicate.
      *
      * @param type          the conversation type
      * @param title         display name of the conversation
      * @param memberUserIds IDs of additional members to add
-     * @return the newly created conversation
+     * @return the newly created (or existing) conversation
      */
     Conversation create(ConversationType type, String title, List<Long> memberUserIds);
+
+    /**
+     * Removes the conversation with the given ID along with all its messages
+     * and member entries.
+     *
+     * @param id the conversation ID to delete
+     */
+    void deleteById(Long id);
 }

@@ -189,10 +189,15 @@ public class SettingsView extends VerticalLayout {
             Div swatch = new Div();
             swatch.addClassName("cc-settings-swatch");
             swatch.addClassName(cls);
-            swatch.addClickListener(e ->
-                    UI.getCurrent().getPage().executeJs(
-                            "document.documentElement.style.setProperty('--cc-accent',$0);" +
-                            "localStorage.setItem('cc-accent',$0);", color));
+            swatch.getElement().setAttribute("tabindex", "0");
+            swatch.getElement().setAttribute("role", "button");
+            swatch.getElement().setAttribute("aria-label", "Set accent colour to " + cls.replace("cc-swatch--", ""));
+            Runnable applyAccent = () -> UI.getCurrent().getPage().executeJs(
+                    "document.documentElement.style.setProperty('--cc-accent',$0);" +
+                    "localStorage.setItem('cc-accent',$0);", color);
+            swatch.addClickListener(e -> applyAccent.run());
+            swatch.getElement().addEventListener("keydown", e -> applyAccent.run())
+                    .setFilter("event.key === 'Enter' || event.key === ' '");
             swatches.add(swatch);
         }
 

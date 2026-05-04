@@ -58,8 +58,22 @@ public class StubConversationService implements ConversationService {
 
     @Override
     public Conversation create(ConversationType type, String title, List<Long> memberUserIds) {
-        long newId = store.getConversationIdSeq().incrementAndGet();
         AppUser creator = userService.getCurrentUser();
+
+        if (type == ConversationType.DIRECT) {
+            Set<Long> desiredMemberIds = new HashSet<>(memberUserIds);
+            desiredMemberIds.add(creator.id());
+            synchronized (store.allConversations) {
+                for (Conversation c : store.allConversations) {
+                    if (c.type() != ConversationType.DIRECT) continue;
+                    List<AppUser> existing = store.membersByConversation.getOrDefault(c.id(), Collections.emptyList());
+                    if (existing.size() != desiredMemberIds.size()) continue;
+                    if (existing.stream().allMatch(m -> desiredMemberIds.contains(m.id()))) return c;
+                }
+            }
+        }
+
+        long newId = store.getConversationIdSeq().incrementAndGet();
         Conversation conv = new Conversation(newId, type, title, creator, OffsetDateTime.now());
         store.allConversations.add(conv);
 
@@ -73,5 +87,14 @@ public class StubConversationService implements ConversationService {
         store.membersByConversation.put(newId, members);
         store.messagesByConversation.put(newId, Collections.synchronizedList(new ArrayList<>()));
         return conv;
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        synchronized (store.allConversations) {
+            store.allConversations.removeIf(c -> c.id().equals(id));
+        }
+        store.membersByConversation.remove(id);
+        store.messagesByConversation.remove(id);
     }
 }

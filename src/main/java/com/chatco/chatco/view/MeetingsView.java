@@ -196,7 +196,12 @@ public class MeetingsView extends VerticalLayout {
 
         Div card = new Div(titleSpan, timeSpan, roomSpan, avatarRow);
         card.addClassName("cc-meeting-card");
+        card.getElement().setAttribute("tabindex", "0");
+        card.getElement().setAttribute("role", "button");
         card.addClickListener(e -> openMeetingDetail(meeting, participants, currentUser));
+        card.getElement().addEventListener("keydown",
+                e -> openMeetingDetail(meeting, participants, currentUser))
+                .setFilter("event.key === 'Enter' || event.key === ' '");
         return card;
     }
 
@@ -332,7 +337,7 @@ public class MeetingsView extends VerticalLayout {
         MultiSelectComboBox<AppUser> participantBox = new MultiSelectComboBox<>("Participants");
         AppUser currentUser = userService.getCurrentUser();
         participantBox.setItems(userService.getAll().stream()
-                .filter(u -> !u.id().equals(currentUser.id())).toList());
+                .filter(u -> !u.id().equals(currentUser.id()) && u.active()).toList());
         participantBox.setItemLabelGenerator(AppUser::displayName);
         participantBox.setWidthFull();
 

@@ -28,8 +28,10 @@ import java.time.format.DateTimeFormatter;
  * Admin dashboard, accessible only to users with the {@code ADMINISTRATOR} role.
  *
  * <p>Provides three tabs: user management, channel management, and system info.
- * Destructive actions (delete, deactivate) and data exports are stubbed and
- * show a notification until the backend is connected.
+ * User activate/deactivate, role/status edits, user creation, and channel deletion
+ * are fully functional against the in-memory stub store.
+ * CSV export, channel archive, and backup creation remain stubbed and show a
+ * notification until the backend is connected.
  */
 @Route(value = "admin", layout = MainLayout.class)
 @AnonymousAllowed
@@ -97,17 +99,6 @@ public class AdminView extends VerticalLayout implements BeforeEnterObserver {
         Div panel = new Div();
         panel.addClassName("cc-admin-panel");
 
-        Button exportBtn = new Button("Export CSV");
-        exportBtn.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_SMALL);
-        exportBtn.addClickListener(e -> toast("CSV export not yet implemented", false));
-
-        Button addUserBtn = new Button("Add User");
-        addUserBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
-        addUserBtn.addClickListener(e -> openAddUserDialog());
-
-        Div toolbar = new Div(exportBtn, addUserBtn);
-        toolbar.addClassName("cc-admin-toolbar");
-
         Grid<AppUser> grid = new Grid<>(AppUser.class, false);
         grid.addColumn(AppUser::username).setHeader("Username").setSortable(true).setFlexGrow(2);
         grid.addColumn(AppUser::displayName).setHeader("Display Name").setSortable(true).setFlexGrow(2);
@@ -116,11 +107,21 @@ public class AdminView extends VerticalLayout implements BeforeEnterObserver {
         grid.addColumn(u -> u.status().name()).setHeader("Status").setSortable(true).setFlexGrow(1);
         grid.addColumn(u -> u.createdAt().format(DATE_FMT)).setHeader("Created").setFlexGrow(1);
         grid.addComponentColumn(u -> buildUserActions(u, grid)).setHeader("Actions").setFlexGrow(0).setWidth("160px");
-
         grid.setItems(userService.getAll());
         grid.addClassName("cc-admin-grid");
         grid.setAllRowsVisible(true);
         grid.setWidthFull();
+
+        Button exportBtn = new Button("Export CSV");
+        exportBtn.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_SMALL);
+        exportBtn.addClickListener(e -> toast("CSV export not yet implemented", false));
+
+        Button addUserBtn = new Button("Add User");
+        addUserBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
+        addUserBtn.addClickListener(e -> openAddUserDialog(grid));
+
+        Div toolbar = new Div(exportBtn, addUserBtn);
+        toolbar.addClassName("cc-admin-toolbar");
 
         panel.add(toolbar, grid);
         return panel;
@@ -147,7 +148,7 @@ public class AdminView extends VerticalLayout implements BeforeEnterObserver {
         return actions;
     }
 
-    private void openAddUserDialog() {
+    private void openAddUserDialog(Grid<AppUser> grid) {
         Dialog dialog = new Dialog();
         dialog.setHeaderTitle("Add User");
 
@@ -163,7 +164,13 @@ public class AdminView extends VerticalLayout implements BeforeEnterObserver {
         role.setWidthFull();
 
         Button save = new Button("Add User", e -> {
-            toast("User added (stub)", true);
+            String usernameVal = username.getValue().trim();
+            String displayNameVal = displayName.getValue().trim();
+            if (usernameVal.isBlank()) { username.setInvalid(true); return; }
+            if (displayNameVal.isBlank()) { displayName.setInvalid(true); return; }
+            userService.addUser(usernameVal, displayNameVal, email.getValue().trim(), role.getValue());
+            grid.setItems(userService.getAll());
+            toast("User added", true);
             dialog.close();
         });
         save.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
@@ -220,7 +227,7 @@ public class AdminView extends VerticalLayout implements BeforeEnterObserver {
         grid.addColumn(c -> c.type().name()).setHeader("Type").setSortable(true).setFlexGrow(1);
         grid.addColumn(c -> c.creator().displayName()).setHeader("Created by").setFlexGrow(2);
         grid.addColumn(c -> c.createdAt().format(DATE_FMT)).setHeader("Created").setFlexGrow(1);
-        grid.addComponentColumn(this::buildChannelActions).setHeader("Actions").setFlexGrow(0).setWidth("160px");
+        grid.addComponentColumn(conv -> buildChannelActions(conv, grid)).setHeader("Actions").setFlexGrow(0).setWidth("160px");
 
         grid.setItems(conversationService.getByType(ConversationType.CHANNEL));
         grid.addClassName("cc-admin-grid");
@@ -231,28 +238,30 @@ public class AdminView extends VerticalLayout implements BeforeEnterObserver {
         return panel;
     }
 
-    private Div buildChannelActions(Conversation conv) {
+    private Div buildChannelActions(Conversation conv, Grid<Conversation> grid) {
         Button archive = new Button("Archive");
         archive.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_TERTIARY);
         archive.addClickListener(e -> toast("Archived " + conv.title() + " (stub)", false));
 
         Button delete = new Button("Delete");
         delete.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_ERROR);
-        delete.addClickListener(e -> openDeleteConvDialog(conv));
+        delete.addClickListener(e -> openDeleteConvDialog(conv, grid));
 
         Div actions = new Div(archive, delete);
         actions.addClassName("cc-admin-row-actions");
         return actions;
     }
 
-    private void openDeleteConvDialog(Conversation conv) {
+    private void openDeleteConvDialog(Conversation conv, Grid<Conversation> grid) {
         Dialog dialog = new Dialog();
         dialog.setHeaderTitle("Delete channel?");
         Span msg = new Span("Delete \"" + conv.title() + "\"? This cannot be undone.");
         msg.addClassName("cc-confirm-msg");
 
         Button confirm = new Button("Delete", e -> {
-            toast("Deleted " + conv.title() + " (stub)", false);
+            conversationService.deleteById(conv.id());
+            grid.setItems(conversationService.getByType(ConversationType.CHANNEL));
+            toast("Deleted " + conv.title(), true);
             dialog.close();
         });
         confirm.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);

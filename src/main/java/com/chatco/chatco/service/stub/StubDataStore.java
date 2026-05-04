@@ -57,6 +57,7 @@ public class StubDataStore {
 
     final Map<Long, List<MeetingParticipant>> participantsByMeeting;
 
+    private final AtomicLong userIdSeq         = new AtomicLong(5);
     private final AtomicLong messageIdSeq      = new AtomicLong(100);
     private final AtomicLong meetingIdSeq      = new AtomicLong(10);
     private final AtomicLong conversationIdSeq = new AtomicLong(8);
@@ -140,6 +141,7 @@ public class StubDataStore {
         ))));
     }
 
+    public AtomicLong getUserIdSeq()         { return userIdSeq; }
     public AtomicLong getMessageIdSeq()      { return messageIdSeq; }
     public AtomicLong getMeetingIdSeq()      { return meetingIdSeq; }
     public AtomicLong getConversationIdSeq() { return conversationIdSeq; }

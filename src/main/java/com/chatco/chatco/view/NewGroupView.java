@@ -50,7 +50,7 @@ public class NewGroupView extends VerticalLayout {
         memberList.addClassName("cc-new-conv-list");
 
         userService.getAll().stream()
-                .filter(u -> !u.id().equals(currentUser.id()))
+                .filter(u -> !u.id().equals(currentUser.id()) && u.active())
                 .forEach(u -> memberList.add(buildMemberCheckRow(u)));
 
         Button create = new Button("Create Group");

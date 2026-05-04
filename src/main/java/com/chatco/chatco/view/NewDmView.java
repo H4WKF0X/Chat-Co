@@ -40,7 +40,7 @@ public class NewDmView extends VerticalLayout {
 
         AppUser currentUser = userService.getCurrentUser();
         List<AppUser> others = userService.getAll().stream()
-                .filter(u -> !u.id().equals(currentUser.id()))
+                .filter(u -> !u.id().equals(currentUser.id()) && u.active())
                 .toList();
 
         Div list = new Div();
@@ -79,22 +79,25 @@ public class NewDmView extends VerticalLayout {
 
         Div row = new Div(avatar, info, dot);
         row.addClassName("cc-new-conv-user-row");
-        row.addClickListener(e -> {
-            conversationService.getByType(ConversationType.DIRECT).stream()
-                    .filter(c -> {
-                        var members = conversationService.getMembers(c.id());
-                        return members.stream().anyMatch(m -> m.id().equals(user.id()))
-                                && members.stream().anyMatch(m -> m.id().equals(currentUser.id()));
-                    })
-                    .findFirst()
-                    .ifPresentOrElse(
-                            c -> UI.getCurrent().navigate("conversation/" + c.id()),
-                            () -> {
-                                var conv = conversationService.create(ConversationType.DIRECT, user.displayName(), List.of(user.id()));
-                                UI.getCurrent().navigate("conversation/" + conv.id());
-                            }
-                    );
-        });
+        row.getElement().setAttribute("tabindex", "0");
+        row.getElement().setAttribute("role", "button");
+        Runnable openDm = () -> conversationService.getByType(ConversationType.DIRECT).stream()
+                .filter(c -> {
+                    var members = conversationService.getMembers(c.id());
+                    return members.stream().anyMatch(m -> m.id().equals(user.id()))
+                            && members.stream().anyMatch(m -> m.id().equals(currentUser.id()));
+                })
+                .findFirst()
+                .ifPresentOrElse(
+                        c -> UI.getCurrent().navigate("conversation/" + c.id()),
+                        () -> {
+                            var conv = conversationService.create(ConversationType.DIRECT, user.displayName(), List.of(user.id()));
+                            UI.getCurrent().navigate("conversation/" + conv.id());
+                        }
+                );
+        row.addClickListener(e -> openDm.run());
+        row.getElement().addEventListener("keydown", e -> openDm.run())
+                .setFilter("event.key === 'Enter' || event.key === ' '");
         return row;
     }
 }

@@ -1,5 +1,6 @@
 package com.chatco.chatco.view.components;
 
+import com.chatco.chatco.model.AppUser;
 import com.chatco.chatco.model.Conversation;
 import com.chatco.chatco.model.ConversationType;
 import com.chatco.chatco.service.ConversationService;
@@ -11,6 +12,7 @@ import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -27,7 +29,7 @@ public class SidebarComponent extends VerticalLayout {
     private final Map<Long, Div> navItems = new HashMap<>();
     private Consumer<Conversation> onSelect;
 
-    // Stub unread counts keyed by conversation ID (StubDataStore: general=1, dev-talk=2, dm-alex=4)
+    // Stub unread counts keyed by conversation ID (conversation IDs per StubDataStore: general → 1, dev-talk → 2, dm-alex → 4)
     private static final Map<Long, Integer> UNREAD = Map.of(
             1L, 3,
             2L, 1,
@@ -44,12 +46,14 @@ public class SidebarComponent extends VerticalLayout {
         workspaceHeader.addClassName("cc-workspace-header");
         workspaceHeader.setText("Chat-Co");
 
+        Long currentUserId = userService.getCurrentUser().id();
+
         Div scrollArea = new Div();
         scrollArea.addClassName("cc-sidebar-scroll");
         scrollArea.add(
-                buildSection("# Channels",       ConversationType.CHANNEL, conversationService, "new-channel"),
-                buildSection("⊞ Groups",          ConversationType.GROUP,   conversationService, "new-group"),
-                buildSection("Direct Messages",   ConversationType.DIRECT,  conversationService, "new-dm")
+                buildSection("# Channels",       ConversationType.CHANNEL, conversationService, "new-channel", currentUserId),
+                buildSection("⊞ Groups",          ConversationType.GROUP,   conversationService, "new-group",   currentUserId),
+                buildSection("Direct Messages",   ConversationType.DIRECT,  conversationService, "new-dm",      currentUserId)
         );
 
         Div userFooter = buildUserFooter(userService);
@@ -59,19 +63,25 @@ public class SidebarComponent extends VerticalLayout {
     }
 
     private Div buildSection(String title, ConversationType type,
-                             ConversationService conversationService, String addRoute) {
+                             ConversationService conversationService, String addRoute, Long currentUserId) {
         Div section = new Div();
         section.addClassName("cc-sidebar-section");
 
         Span titleSpan = new Span(title);
         titleSpan.addClassName("cc-sidebar-section-title-text");
 
+        String ariaLabel = switch (addRoute) {
+            case "new-channel" -> "New Channel";
+            case "new-group"   -> "New Group";
+            case "new-dm"      -> "New Direct Message";
+            default            -> "New";
+        };
         Span addBtn = new Span("+");
         addBtn.addClassName("cc-sidebar-add-btn");
-        addBtn.getElement().setAttribute("title", "New");
+        addBtn.getElement().setAttribute("title", ariaLabel);
         addBtn.getElement().setAttribute("role", "button");
         addBtn.getElement().setAttribute("tabindex", "0");
-        addBtn.getElement().setAttribute("aria-label", "New");
+        addBtn.getElement().setAttribute("aria-label", ariaLabel);
         addBtn.addClickListener(e -> UI.getCurrent().navigate(addRoute));
         addBtn.getElement().addEventListener("keydown", e -> UI.getCurrent().navigate(addRoute))
                 .setFilter("event.key === 'Enter' || event.key === ' '");
@@ -81,6 +91,8 @@ public class SidebarComponent extends VerticalLayout {
         section.add(header);
 
         for (Conversation conv : conversationService.getByType(type)) {
+            List<AppUser> members = conversationService.getMembers(conv.id());
+            if (members.stream().noneMatch(m -> m.id().equals(currentUserId))) continue;
             Div item = buildNavItem(conv);
             navItems.put(conv.id(), item);
             section.add(item);
@@ -105,9 +117,14 @@ public class SidebarComponent extends VerticalLayout {
             item.add(badge);
         }
 
+        item.getElement().setAttribute("tabindex", "0");
+        item.getElement().setAttribute("role", "button");
         item.addClickListener(e -> {
             if (onSelect != null) onSelect.accept(conv);
         });
+        item.getElement().addEventListener("keydown", e -> {
+            if (onSelect != null) onSelect.accept(conv);
+        }).setFilter("event.key === 'Enter' || event.key === ' '");
         return item;
     }
 
