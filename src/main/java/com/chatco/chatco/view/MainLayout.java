@@ -31,6 +31,7 @@ public class MainLayout extends HorizontalLayout implements RouterLayout, AfterN
     private final Div railChat;
     private final Div railMeetings;
     private final Div railAdmin;
+    private final Div railSettings;
 
     public MainLayout(ConversationService conversationService, UserService userService) {
         addClassName("cc-app-shell");
@@ -50,6 +51,7 @@ public class MainLayout extends HorizontalLayout implements RouterLayout, AfterN
         railChat     = buildRailIcon("💬", "Chat",     () -> UI.getCurrent().navigate(""));
         railMeetings = buildRailIcon("📅", "Meetings", () -> UI.getCurrent().navigate("meetings"));
         railAdmin    = buildRailIcon("⚙", "Admin",    () -> UI.getCurrent().navigate("admin"));
+        railSettings = buildRailIcon("⚙️", "Settings", () -> UI.getCurrent().navigate("settings"));
         railAdmin.setVisible(isAdmin);
 
         add(buildRail(isAdmin), sidebar, contentArea);
@@ -73,10 +75,9 @@ public class MainLayout extends HorizontalLayout implements RouterLayout, AfterN
         if (isAdmin) navIcons.add(railAdmin);
         navIcons.addClassName("cc-rail-nav");
 
-        Div settings = buildRailIcon("⚙️", "Settings", () -> UI.getCurrent().navigate("settings"));
-        settings.addClassName("cc-rail-settings");
+        railSettings.addClassName("cc-rail-settings");
 
-        rail.add(logo, navIcons, settings);
+        rail.add(logo, navIcons, railSettings);
         return rail;
     }
 
@@ -110,6 +111,7 @@ public class MainLayout extends HorizontalLayout implements RouterLayout, AfterN
         railChat.removeClassName("cc-rail-btn--active");
         railMeetings.removeClassName("cc-rail-btn--active");
         railAdmin.removeClassName("cc-rail-btn--active");
+        railSettings.removeClassName("cc-rail-btn--active");
 
         if (path.startsWith("conversation/") || path.isEmpty()) {
             railChat.addClassName("cc-rail-btn--active");
@@ -117,6 +119,8 @@ public class MainLayout extends HorizontalLayout implements RouterLayout, AfterN
             railMeetings.addClassName("cc-rail-btn--active");
         } else if (path.startsWith("admin")) {
             railAdmin.addClassName("cc-rail-btn--active");
+        } else if (path.startsWith("settings")) {
+            railSettings.addClassName("cc-rail-btn--active");
         }
 
         boolean showSidebar = !path.startsWith("meetings") && !path.startsWith("admin") && !path.startsWith("settings");

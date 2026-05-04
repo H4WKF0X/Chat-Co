@@ -1,6 +1,7 @@
 package com.chatco.chatco.service;
 
 import com.chatco.chatco.model.AppUser;
+import com.chatco.chatco.model.UserRole;
 
 import java.util.List;
 import java.util.Optional;
@@ -38,4 +39,11 @@ public interface UserService {
      * and active-flag changes within the current session.
      */
     void updateUser(AppUser updated);
+
+    /**
+     * Creates and stores a new user with the given attributes.
+     * The new user is active by default with {@code ACTIVE} status.
+     * The new user is assigned a unique ID from the ID sequence.
+     */
+    void addUser(String username, String displayName, String mail, UserRole role);
 }

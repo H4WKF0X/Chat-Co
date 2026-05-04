@@ -1,10 +1,13 @@
 package com.chatco.chatco.service.stub;
 
 import com.chatco.chatco.model.AppUser;
+import com.chatco.chatco.model.UserRole;
+import com.chatco.chatco.model.UserStatus;
 import com.chatco.chatco.service.UserService;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -48,5 +51,11 @@ public class StubUserService implements UserService {
                 }
             }
         }
+    }
+
+    @Override
+    public void addUser(String username, String displayName, String mail, UserRole role) {
+        long newId = store.getUserIdSeq().incrementAndGet();
+        store.allUsers.add(new AppUser(newId, username, displayName, mail, true, UserStatus.ACTIVE, role, OffsetDateTime.now()));
     }
 }

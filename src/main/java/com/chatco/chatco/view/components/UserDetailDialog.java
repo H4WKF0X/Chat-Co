@@ -18,7 +18,7 @@ import java.time.format.DateTimeFormatter;
  *
  * <p>Displays avatar, name, username, email, presence status, and join date.
  * The "Send Message" button navigates to an existing direct message conversation
- * with the user, if one exists. Creating a new DM is not yet supported here.
+ * with the user if one already exists, or falls back to the {@code new-dm} flow.
  */
 public class UserDetailDialog extends Dialog {
 

@@ -68,6 +68,9 @@ public class StubMeetingService implements MeetingService {
     @Override
     public Meeting create(String title, String description, OffsetDateTime startAt, OffsetDateTime endAt,
                           String locationOrLink, Room room, List<Long> participantUserIds) {
+        if (!isRoomAvailable(room, startAt, endAt)) {
+            throw new IllegalStateException("Room is already booked for this time slot");
+        }
         AppUser organiser = userService.getCurrentUser();
         long convId = store.getConversationIdSeq().incrementAndGet();
         Conversation conv = new Conversation(convId, ConversationType.GROUP, title, organiser, OffsetDateTime.now());

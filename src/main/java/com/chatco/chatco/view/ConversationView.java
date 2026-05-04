@@ -202,7 +202,12 @@ public class ConversationView extends VerticalLayout implements BeforeEnterObser
         Div row = new Div(avatar, name, dot);
         row.addClassName("cc-member-row");
         if (!member.id().equals(currentUser.id())) {
+            row.getElement().setAttribute("tabindex", "0");
+            row.getElement().setAttribute("role", "button");
             row.addClickListener(e -> new UserDetailDialog(member, currentUser, conversationService).open());
+            row.getElement().addEventListener("keydown",
+                    e -> new UserDetailDialog(member, currentUser, conversationService).open())
+                    .setFilter("event.key === 'Enter' || event.key === ' '");
         }
         return row;
     }
@@ -325,11 +330,14 @@ public class ConversationView extends VerticalLayout implements BeforeEnterObser
     private Div buildReplyStrip(Message original) {
         Span sender = new Span(original.sender().displayName() + ": ");
         sender.addClassName("cc-reply-sender");
-        String preview = original.content().length() > 80
-                ? original.content().substring(0, 80) + "…"
-                : original.content();
+        boolean originalDeleted = original.deletedAt() != null;
+        String preview = originalDeleted ? "[Message deleted]"
+                : (original.content().length() > 80
+                   ? original.content().substring(0, 80) + "…"
+                   : original.content());
         Span text = new Span(preview);
         text.addClassName("cc-reply-text");
+        if (originalDeleted) text.addClassName("cc-msg-deleted");
         Div strip = new Div(sender, text);
         strip.addClassName("cc-msg-reply-strip");
         return strip;
