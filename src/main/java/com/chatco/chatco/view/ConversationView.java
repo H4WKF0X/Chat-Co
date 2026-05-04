@@ -252,7 +252,7 @@ public class ConversationView extends VerticalLayout implements BeforeEnterObser
                 messageArea.add(buildDateSeparator(msgDate));
                 lastDate = msgDate;
             }
-            messageArea.add(buildMessageRow(m, currentUser));
+            messageArea.add(buildMessageRow(m, currentUser, messages));
         }
     }
 
@@ -270,7 +270,7 @@ public class ConversationView extends VerticalLayout implements BeforeEnterObser
         return sep;
     }
 
-    private Div buildMessageRow(Message m, AppUser currentUser) {
+    private Div buildMessageRow(Message m, AppUser currentUser, List<Message> allMessages) {
         boolean isOwn    = m.sender().id().equals(currentUser.id());
         boolean isDeleted = m.deletedAt() != null;
 
@@ -304,7 +304,13 @@ public class ConversationView extends VerticalLayout implements BeforeEnterObser
         contentArea.addClassName("cc-msg-content-area");
 
         if (m.replyTo() != null && !isDeleted) {
-            contentArea.add(buildReplyStrip(m.replyTo()));
+            // Look up the live version so that a soft-deleted original shows "[Message deleted]"
+            // instead of leaking the content from the stale snapshot stored in m.replyTo().
+            Message liveReplyTo = allMessages.stream()
+                    .filter(msg -> msg.id().equals(m.replyTo().id()))
+                    .findFirst()
+                    .orElse(m.replyTo());
+            contentArea.add(buildReplyStrip(liveReplyTo));
         }
 
         Span content = new Span(isDeleted ? "[Message deleted]" : m.content());
