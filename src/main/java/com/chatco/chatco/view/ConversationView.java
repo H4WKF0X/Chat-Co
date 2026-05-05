@@ -124,7 +124,8 @@ public class ConversationView extends VerticalLayout implements BeforeEnterObser
         replyBarText.addClassName("cc-reply-bar-text");
 
         Button cancelReply = new Button("×");
-        cancelReply.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE, ButtonVariant.LUMO_SMALL);
+        cancelReply.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_SMALL);
+        cancelReply.addClassName("cc-reply-cancel-btn");
         cancelReply.addClickListener(e -> clearReplyTarget());
 
         replyBar.addClassName("cc-reply-bar");
@@ -254,6 +255,7 @@ public class ConversationView extends VerticalLayout implements BeforeEnterObser
             }
             messageArea.add(buildMessageRow(m, currentUser, messages));
         }
+        messageArea.getElement().executeJs("this.scrollTop = this.scrollHeight");
     }
 
     private Div buildDateSeparator(LocalDate date) {

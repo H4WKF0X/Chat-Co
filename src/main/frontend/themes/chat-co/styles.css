@@ -474,13 +474,18 @@ body > div {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 5px 4px 6px;
+  padding: 5px 8px 6px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   margin-bottom: 6px;
 }
 
+.cc-reply-cancel-btn {
+  flex-shrink: 0;
+}
+
 .cc-reply-bar-text {
   flex: 1;
+  min-width: 0;
   font-size: 12px;
   color: var(--cc-text-secondary);
   white-space: nowrap;

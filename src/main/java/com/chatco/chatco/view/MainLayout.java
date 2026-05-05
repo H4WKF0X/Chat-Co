@@ -50,7 +50,7 @@ public class MainLayout extends HorizontalLayout implements RouterLayout, AfterN
         boolean isAdmin = userService.getCurrentUser().role() == UserRole.ADMINISTRATOR;
         railChat     = buildRailIcon("💬", "Chat",     () -> UI.getCurrent().navigate(""));
         railMeetings = buildRailIcon("📅", "Meetings", () -> UI.getCurrent().navigate("meetings"));
-        railAdmin    = buildRailIcon("⚙", "Admin",    () -> UI.getCurrent().navigate("admin"));
+        railAdmin    = buildRailIcon("🛡", "Admin",    () -> UI.getCurrent().navigate("admin"));
         railSettings = buildRailIcon("⚙️", "Settings", () -> UI.getCurrent().navigate("settings"));
         railAdmin.setVisible(isAdmin);
 
