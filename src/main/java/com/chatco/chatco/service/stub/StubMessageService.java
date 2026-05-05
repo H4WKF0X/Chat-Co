@@ -33,7 +33,10 @@ public class StubMessageService implements MessageService {
 
     @Override
     public List<Message> getByConversation(Long conversationId) {
-        return store.messagesByConversation.getOrDefault(conversationId, Collections.emptyList());
+        List<Message> messages = store.messagesByConversation.getOrDefault(conversationId, Collections.emptyList());
+        synchronized (messages) {
+            return List.copyOf(messages);
+        }
     }
 
     @Override

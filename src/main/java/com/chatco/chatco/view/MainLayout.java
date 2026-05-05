@@ -113,7 +113,8 @@ public class MainLayout extends HorizontalLayout implements RouterLayout, AfterN
         railAdmin.removeClassName("cc-rail-btn--active");
         railSettings.removeClassName("cc-rail-btn--active");
 
-        if (path.startsWith("conversation/") || path.isEmpty()) {
+        if (path.startsWith("conversation/") || path.isEmpty()
+                || path.startsWith("new-dm") || path.startsWith("new-group") || path.startsWith("new-channel")) {
             railChat.addClassName("cc-rail-btn--active");
         } else if (path.startsWith("meetings")) {
             railMeetings.addClassName("cc-rail-btn--active");

@@ -28,7 +28,9 @@ public class StubUserService implements UserService {
 
     @Override
     public List<AppUser> getAll() {
-        return store.allUsers;
+        synchronized (store.allUsers) {
+            return List.copyOf(store.allUsers);
+        }
     }
 
     @Override
