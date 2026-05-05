@@ -68,40 +68,42 @@ public class StubMeetingService implements MeetingService {
     @Override
     public Meeting create(String title, String description, OffsetDateTime startAt, OffsetDateTime endAt,
                           String locationOrLink, Room room, List<Long> participantUserIds) {
-        if (!isRoomAvailable(room, startAt, endAt)) {
-            throw new IllegalStateException("Room is already booked for this time slot");
-        }
         AppUser organiser = userService.getCurrentUser();
-        long convId = store.getConversationIdSeq().incrementAndGet();
-        Conversation conv = new Conversation(convId, ConversationType.GROUP, title, organiser, OffsetDateTime.now());
-        store.allConversations.add(conv);
-        store.messagesByConversation.put(convId, Collections.synchronizedList(new ArrayList<>()));
-
-        List<AppUser> convMembers = Collections.synchronizedList(new ArrayList<>());
-        convMembers.add(organiser);
-        for (Long uid : participantUserIds) {
-            if (!uid.equals(organiser.id())) {
-                userService.findById(uid).ifPresent(convMembers::add);
+        synchronized (store.allMeetings) {
+            if (!isRoomAvailable(room, startAt, endAt)) {
+                throw new IllegalStateException("Room is already booked for this time slot");
             }
-        }
-        store.membersByConversation.put(convId, convMembers);
+            long convId = store.getConversationIdSeq().incrementAndGet();
+            Conversation conv = new Conversation(convId, ConversationType.GROUP, title, organiser, OffsetDateTime.now());
+            store.allConversations.add(conv);
+            store.messagesByConversation.put(convId, Collections.synchronizedList(new ArrayList<>()));
 
-        Meeting meeting = new Meeting(
-                store.getMeetingIdSeq().incrementAndGet(),
-                title, description, startAt, endAt, locationOrLink, room, conv
-        );
-        store.allMeetings.add(meeting);
-
-        List<MeetingParticipant> participants = Collections.synchronizedList(new ArrayList<>());
-        participants.add(new MeetingParticipant(meeting, organiser, ParticipantStatus.ACCEPTED));
-        for (Long uid : participantUserIds) {
-            if (!uid.equals(organiser.id())) {
-                userService.findById(uid).ifPresent(u ->
-                        participants.add(new MeetingParticipant(meeting, u, ParticipantStatus.INVITED)));
+            List<AppUser> convMembers = Collections.synchronizedList(new ArrayList<>());
+            convMembers.add(organiser);
+            for (Long uid : participantUserIds) {
+                if (!uid.equals(organiser.id())) {
+                    userService.findById(uid).ifPresent(convMembers::add);
+                }
             }
+            store.membersByConversation.put(convId, convMembers);
+
+            Meeting meeting = new Meeting(
+                    store.getMeetingIdSeq().incrementAndGet(),
+                    title, description, startAt, endAt, locationOrLink, room, conv
+            );
+            store.allMeetings.add(meeting);
+
+            List<MeetingParticipant> participants = Collections.synchronizedList(new ArrayList<>());
+            participants.add(new MeetingParticipant(meeting, organiser, ParticipantStatus.ACCEPTED));
+            for (Long uid : participantUserIds) {
+                if (!uid.equals(organiser.id())) {
+                    userService.findById(uid).ifPresent(u ->
+                            participants.add(new MeetingParticipant(meeting, u, ParticipantStatus.INVITED)));
+                }
+            }
+            store.participantsByMeeting.put(meeting.id(), participants);
+            return meeting;
         }
-        store.participantsByMeeting.put(meeting.id(), participants);
-        return meeting;
     }
 
     @Override

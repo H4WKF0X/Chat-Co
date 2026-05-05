@@ -3,6 +3,7 @@ package com.chatco.chatco.service.stub;
 import com.chatco.chatco.model.AppUser;
 import com.chatco.chatco.model.Conversation;
 import com.chatco.chatco.model.ConversationType;
+import com.chatco.chatco.model.Meeting;
 import com.chatco.chatco.service.ConversationService;
 import com.chatco.chatco.service.UserService;
 import org.springframework.context.annotation.Profile;
@@ -70,6 +71,20 @@ public class StubConversationService implements ConversationService {
                     if (existing.size() != desiredMemberIds.size()) continue;
                     if (existing.stream().allMatch(m -> desiredMemberIds.contains(m.id()))) return c;
                 }
+                // Create inside the same lock so a concurrent request for the same pair can't slip in.
+                long newId = store.getConversationIdSeq().incrementAndGet();
+                Conversation conv = new Conversation(newId, type, title, creator, OffsetDateTime.now());
+                store.allConversations.add(conv);
+                List<AppUser> members = Collections.synchronizedList(new ArrayList<>());
+                members.add(creator);
+                for (Long uid : memberUserIds) {
+                    if (!uid.equals(creator.id())) {
+                        userService.findById(uid).ifPresent(members::add);
+                    }
+                }
+                store.membersByConversation.put(newId, members);
+                store.messagesByConversation.put(newId, Collections.synchronizedList(new ArrayList<>()));
+                return conv;
             }
         }
 
@@ -96,5 +111,13 @@ public class StubConversationService implements ConversationService {
         }
         store.membersByConversation.remove(id);
         store.messagesByConversation.remove(id);
+        synchronized (store.allMeetings) {
+            store.allMeetings.stream()
+                    .filter(m -> m.conversation() != null && m.conversation().id().equals(id))
+                    .map(Meeting::id)
+                    .toList()
+                    .forEach(store.participantsByMeeting::remove);
+            store.allMeetings.removeIf(m -> m.conversation() != null && m.conversation().id().equals(id));
+        }
     }
 }

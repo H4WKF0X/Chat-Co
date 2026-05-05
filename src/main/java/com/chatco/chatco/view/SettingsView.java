@@ -174,18 +174,20 @@ public class SettingsView extends VerticalLayout {
         Span accentLabel = new Span("Accent colour");
         accentLabel.addClassName("cc-settings-label");
 
+        // Each entry: accent, hover, subtle, 50pct, 10pct, CSS class
         String[][] accents = {
-            {"#5b8dee", "cc-swatch--blue"},
-            {"#3ba55c", "cc-swatch--green"},
-            {"#ed4245", "cc-swatch--red"},
-            {"#faa61a", "cc-swatch--yellow"},
-            {"#9b59b6", "cc-swatch--purple"},
-            {"#1abc9c", "cc-swatch--teal"}
+            {"#5b8dee", "#4a7de0", "rgba(91,141,238,0.14)",  "rgba(91,141,238,0.5)",   "rgba(91,141,238,0.1)",   "cc-swatch--blue"},
+            {"#3ba55c", "#2d9050", "rgba(59,165,92,0.14)",   "rgba(59,165,92,0.5)",    "rgba(59,165,92,0.1)",    "cc-swatch--green"},
+            {"#ed4245", "#d93235", "rgba(237,66,69,0.14)",   "rgba(237,66,69,0.5)",    "rgba(237,66,69,0.1)",    "cc-swatch--red"},
+            {"#faa61a", "#e5960a", "rgba(250,166,26,0.14)",  "rgba(250,166,26,0.5)",   "rgba(250,166,26,0.1)",   "cc-swatch--yellow"},
+            {"#9b59b6", "#8949a6", "rgba(155,89,182,0.14)",  "rgba(155,89,182,0.5)",   "rgba(155,89,182,0.1)",   "cc-swatch--purple"},
+            {"#1abc9c", "#0aa98b", "rgba(26,188,156,0.14)",  "rgba(26,188,156,0.5)",   "rgba(26,188,156,0.1)",   "cc-swatch--teal"}
         };
         Div swatches = new Div();
         swatches.addClassName("cc-settings-swatches");
         for (String[] accent : accents) {
-            String color = accent[0], cls = accent[1];
+            String color = accent[0], hover = accent[1], subtle = accent[2],
+                   pct50 = accent[3], pct10 = accent[4], cls = accent[5];
             Div swatch = new Div();
             swatch.addClassName("cc-settings-swatch");
             swatch.addClassName(cls);
@@ -193,8 +195,14 @@ public class SettingsView extends VerticalLayout {
             swatch.getElement().setAttribute("role", "button");
             swatch.getElement().setAttribute("aria-label", "Set accent colour to " + cls.replace("cc-swatch--", ""));
             Runnable applyAccent = () -> UI.getCurrent().getPage().executeJs(
-                    "document.documentElement.style.setProperty('--cc-accent',$0);" +
-                    "localStorage.setItem('cc-accent',$0);", color);
+                    "var r=document.documentElement;" +
+                    "r.style.setProperty('--cc-accent',$0);" +
+                    "r.style.setProperty('--cc-accent-hover',$1);" +
+                    "r.style.setProperty('--cc-accent-subtle',$2);" +
+                    "r.style.setProperty('--lumo-primary-color-50pct',$3);" +
+                    "r.style.setProperty('--lumo-primary-color-10pct',$4);" +
+                    "localStorage.setItem('cc-accent',$0);",
+                    color, hover, subtle, pct50, pct10);
             swatch.addClickListener(e -> applyAccent.run());
             swatch.getElement().addEventListener("keydown", e -> applyAccent.run())
                     .setFilter("event.key === 'Enter' || event.key === ' '");
