@@ -3,6 +3,7 @@ package com.chatco.chatco.controller;
 
 import com.chatco.chatco.repository.AppUserRepository;
 import com.chatco.chatco.dto.UserResponse;
+import com.chatco.chatco.web.ClientType;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,7 +20,7 @@ public class UserController {
 
     // GET /api/users/search?q=...
     @GetMapping("/search")
-    public List<UserResponse> search(@RequestParam String q) {
+    public List<UserResponse> search(@RequestParam String q, ClientType clientType) {
         return appUserRepository.searchByUsernameOrDisplayName(q)
                 .stream()
                 .map(u -> new UserResponse(

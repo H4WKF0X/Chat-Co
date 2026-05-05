@@ -5,6 +5,9 @@ import com.chatco.chatco.dto.LoginRequest;
 import com.chatco.chatco.dto.LoginResponse;
 import com.chatco.chatco.security.JwtUtil;
 import com.chatco.chatco.security.LdapAuthService;
+import com.chatco.chatco.web.ClientType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -16,6 +19,8 @@ import java.util.Optional;
 @RequestMapping("/api/auth")
 public class AuthController {
 
+    private static final Logger log = LoggerFactory.getLogger(AuthController.class);
+
     private final LdapAuthService ldapAuthService;
     private final JwtUtil jwtUtil;
 
@@ -24,7 +29,9 @@ public class AuthController {
         this.jwtUtil = jwtUtil;
     }
     @PostMapping("/login")
-    public LoginResponse login(@RequestBody LoginRequest request) {
+    public LoginResponse login(@RequestBody LoginRequest request, ClientType clientType) {
+        log.debug("Login request from client type {}", clientType);
+
         Map<String, Object> profile = ldapAuthService.loginAndFetchProfile(
                 request.username(), request.password()
         );
