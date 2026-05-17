@@ -14,31 +14,25 @@ import org.hibernate.annotations.OnDeleteAction;
 @Data
 @Entity
 @Table(name = "meeting_participant")
-/**
- * Join entity connecting users to meetings with their attendance status.
- */
 public class MeetingParticipant {
-    /** Attendance state such as accepted, declined, or invited. */
-    @Size(max = 20)
-    @NotNull
-    @Column(name = "participant_status", nullable = false, length = 20)
-    private String participantStatus;
 
-    /** User side of the composite key. */
-    @MapsId
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "user_id", nullable = false)
-    private AppUser user;
+    @EmbeddedId
+    private MeetingParticipantId id;
 
-    /** Meeting side of the composite key. */
-    @MapsId
+    @MapsId("meetingId")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "meeting_id", nullable = false)
     private Meeting meeting;
 
-    /** Composite primary key made from meeting id and user id. */
-    @EmbeddedId
-    private MeetingParticipantId id;
+    @MapsId("userId")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "user_id", nullable = false)
+    private AppUser user;
+
+    @Size(max = 20)
+    @NotNull
+    @Column(name = "participant_status", nullable = false, length = 20)
+    private String participantStatus;
 }
