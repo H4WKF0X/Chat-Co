@@ -1,4 +1,4 @@
-package com.chatco.chatco.views;
+package com.chatco.chatco.view;
 
 import com.chatco.chatco.security.LdapAuthService;
 import com.vaadin.flow.component.UI;
