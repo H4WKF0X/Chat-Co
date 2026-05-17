@@ -3,7 +3,6 @@ package com.chatco.chatco.views;
 import com.chatco.chatco.security.LdapAuthService;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.html.Pre;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.PasswordField;
@@ -25,34 +24,24 @@ import java.util.List;
 import java.util.Map;
 
 @Route("ldap-login")
-/**
- * Simple Vaadin login page that authenticates directly against LDAP.
- *
- * <p>On success it stores a Spring Security session so browser navigation can
- * access authenticated Vaadin routes.</p>
- */
 public class LdapLoginView extends VerticalLayout {
 
     private final SecurityContextRepository securityContextRepository =
             new HttpSessionSecurityContextRepository();
 
     public LdapLoginView(LdapAuthService ldapAuthService) {
+        TextField usernameField = new TextField("Username");
+        PasswordField passwordField = new PasswordField("Password");
 
-        TextField username = new TextField("Username");
-        PasswordField password = new PasswordField("Password");
-        Pre output = new Pre(); // Shows the LDAP profile map in a readable format.
-
-        Button login = new Button("Login", e -> {
+        Button loginButton = new Button("Login", e -> {
             Map<String, Object> profile = ldapAuthService.loginAndFetchProfile(
-                    username.getValue(),
-                    password.getValue()
+                    usernameField.getValue(),
+                    passwordField.getValue()
             );
 
             if (profile != null) {
-                // Build a browser-session authentication manually because this
-                // view handles LDAP login itself instead of using formLogin.
                 Authentication authentication = new UsernamePasswordAuthenticationToken(
-                        username.getValue(),
+                        usernameField.getValue(),
                         null,
                         List.of(new SimpleGrantedAuthority("ROLE_USER"))
                 );
@@ -65,15 +54,12 @@ public class LdapLoginView extends VerticalLayout {
                 HttpServletResponse response = VaadinServletResponse.getCurrent().getHttpServletResponse();
                 securityContextRepository.saveContext(context, request, response);
 
-                Notification.show("Login erfolgreich");
-                output.setText(profile.toString());
-                UI.getCurrent().navigate("success");
+                UI.getCurrent().navigate("");
             } else {
                 Notification.show("Login fehlgeschlagen");
-                output.setText("");
             }
         });
 
-        add(username, password, login, output);
+        add(usernameField, passwordField, loginButton);
     }
 }
