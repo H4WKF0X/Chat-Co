@@ -1,8 +1,8 @@
-// security/JwtUtil.java
 package com.chatco.chatco.security;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.convert.DurationUnit;
 import org.springframework.stereotype.Component;
@@ -13,9 +13,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
 @Component
-/**
- * Small helper for creating and validating JWT tokens used by the REST API.
- */
 public class JwtUtil {
 
     @Value("${jwt.secret}")
@@ -24,6 +21,14 @@ public class JwtUtil {
     @Value("${jwt.expiration:1d}")
     @DurationUnit(ChronoUnit.DAYS)
     private Duration expiration;
+
+    @PostConstruct
+    void validate() {
+        if (secret == null || secret.getBytes().length < 32) {
+            throw new IllegalStateException(
+                    "jwt.secret must be at least 32 characters for HMAC-SHA256");
+        }
+    }
 
     private Key key() {
         return Keys.hmacShaKeyFor(secret.getBytes());
