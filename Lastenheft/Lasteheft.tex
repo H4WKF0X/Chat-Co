@@ -1,0 +1,215 @@
+\documentclass[12pt,a4paper]{extarticle}
+
+\usepackage[utf8]{inputenc}
+\usepackage[german]{babel}
+\usepackage{geometry}
+\usepackage{setspace}
+\usepackage{fancyhdr}
+\usepackage[parfill]{parskip} 
+
+\geometry{a4paper, margin=2.5cm}
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{Chat-Co}
+\chead{Version 3.0}
+\rhead{Lastenheft}
+\rfoot{\thepage}
+\lfoot{Team: Alexander Rutz / Maximilian Paesold / Sebastian Weigl}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+
+\onehalfspacing
+
+\title{
+    \textbf{Lastenheft Chat-Co} \\
+    \large Sichere On-Premise Kommunikationslösung
+}
+\author{Alexander Rutz (PM), Maximilian Paesold, Sebastian Weigl}
+\date{Version 2.0 \\ Status: Überarbeitet}
+
+\begin{document}
+\maketitle
+
+\begin{center}
+  \begin{tabular}{|l|l|l|l|l|}
+    \hline
+    Version & Autor & QS & Datum & Kommentar \\
+    \hline
+    1.0 & Projektteam & Rutz & 12.02.2026 & Erster Entwurf \\
+    \hline
+    1.1 & Projektteam & Rutz & 15.02.2026 & Überarbeitung Struktur \\
+    \hline
+    2.0 & Projektteam & Rutz & 20.02.2026 & Anpassung gemäß Team Feedback \\
+    \hline
+    3.0 & Projektteam & Rutz & 27.02.2026 & Anpassungen gemäß Feedback\\
+    \hline
+\end{tabular}
+\end{center}
+
+\newpage
+\tableofcontents
+\newpage
+
+
+\section{Einführung}
+
+Digitale Kommunikation ist ein zentraler Bestandteil moderner Unternehmensprozesse. Viele Organisationen nutzen Cloud-basierte Lösungen, wodurch sensible Daten außerhalb der eigenen Infrastruktur gespeichert werden.
+
+Das Projekt Chat-Co verfolgt daher einen konsequenten On-Premise-Ansatz. Sämtliche Kommunikations- und Organisationsdaten verbleiben innerhalb der unternehmenseigenen IT-Infrastruktur. Dadurch wird die vollständige Datenhoheit gewährleistet und bestehende Sicherheitsrichtlinien können eingehalten werden.
+
+Dieses Lastenheft beschreibt die Anforderungen an das System aus Sicht des Auftraggebers.
+
+\section{Zielbestimmung}
+
+Ziel des Projektes ist die Entwicklung einer sicheren, unternehmensinternen Kommunikationsplattform.
+
+Das System soll eine strukturierte und datenschutzkonforme Kommunikation innerhalb einer Organisation ermöglichen. Dabei dürfen sämtliche Daten ausschließlich innerhalb der eigenen IT-Infrastruktur verarbeitet werden.
+
+Darüber hinaus soll die interne Zusammenarbeit durch Echtzeitkommunikation sowie Termin- und Ressourcenverwaltung effizienter gestaltet werden.
+
+\section{Produkteinsatz}
+
+Chat-Co wird in Unternehmen, Behörden und Bildungseinrichtungen eingesetzt, die erhöhte Anforderungen an Datenschutz und Datensicherheit haben.
+
+Das Produkt dient der internen Kommunikation von Mitarbeitern sowie der Organisation von Meetings und Ressourcen.
+
+Zielgruppe sind Administratoren, Mitarbeiter und Projektteams innerhalb einer Organisation.
+
+\newpage
+\section{Produktübersicht}
+
+Chat-Co ist eine On-Premise Kommunikationsplattform zur Verwaltung von Textnachrichten, Dateien, Terminen und Ressourcen.
+
+Das System wird innerhalb der bestehenden IT-Infrastruktur betrieben und integriert vorhandene Benutzerverzeichnisse.
+
+\section{Produktfunktionen}
+
+\subsection*{Benutzer- und Sicherheitsfunktionen}
+
+/LF10/ Das System muss die Anmeldung eines Benutzers über LDAP ermöglichen.  
+
+/LF20/ Das System muss eine rollenbasierte Rechteverwaltung für Administratoren, Mitarbeiter und Gäste bereitstellen.  
+
+/LF30/ Das System muss Benutzerprofile mit Namen, Statusanzeige und optionalem Avatar verwalten.  
+
+/LF40/ Das System muss Benutzer bei Inaktivität automatisch abmelden.  
+
+\subsection*{Kommunikationsfunktionen}
+
+/LF50/ Das System muss eine Echtzeit-Textkommunikation zwischen Benutzern ermöglichen.  
+
+/LF60/ Das System muss das Bearbeiten und Löschen gesendeter Nachrichten unterstützen.  
+
+/LF70/ Das System muss die Verwendung von Emojis und einfacher Textformatierung unterstützen.  
+
+\subsection*{Datei- und Kanalverwaltung}
+
+/LF80/ Das System muss das Erstellen und Verwalten von Kommunikationskanälen ermöglichen.  
+
+/LF90/ Das System muss Benutzer einzelnen Kanälen zuordnen können.  
+
+/LF100/ Das System muss den sicheren Austausch von Dateien innerhalb von Chats ermöglichen.  
+
+\newpage
+\subsection*{Meeting- und Organisationsfunktionen}
+
+/LF110/ Das System muss das Erstellen von Meeting-Anfragen ermöglichen.  
+
+/LF120/ Das System muss Einladungen an ausgewählte Benutzer versenden können.  
+
+/LF130/ Das System muss verfügbare Räume anzeigen und Buchungen verwalten.  
+
+/LF140/ Das System muss Doppelbuchungen von Räumen verhindern.  
+
+\subsection*{Administrationsfunktionen}
+
+/LF150/ Das System muss ein Administrations-Dashboard zur Übersicht über aktive Benutzer bereitstellen.  
+ 
+/LF160/ Das System muss eine Volltextsuche innerhalb der Chat-Historie ermöglichen.  
+ 
+
+
+\section{Produktdaten}
+
+/LD10/ Es sind die relevanten Benutzerdaten zu speichern.  
+
+/LD20/ Es sind Rollen- und Berechtigungsinformationen zu speichern.  
+
+/LD30/ Es sind Chatnachrichten und zugehörige Metadaten zu speichern.  
+
+/LD40/ Es sind Datei- und Anhangsinformationen zu speichern.  
+
+/LD50/ Es sind Kalender- und Meetingdaten zu speichern.  
+
+/LD60/ Es sind Raum- und Ressourceninformationen zu speichern.  
+
+/LD70/ Es sind Systemprotokolle zu speichern.  
+
+\section{Produktleistungen}
+
+/LL10/ Die Anmeldung eines Benutzers darf eine Interaktionszeit von fünf Sekunden nicht überschreiten.  
+
+/LL20/ Chatnachrichten müssen innerhalb von fünf Sekunden beim Empfänger angezeigt werden.  
+
+/LL30/ Das System muss mindestens 50 gleichzeitige Benutzer unterstützen.  
+
+/LL40/ Es müssen mindestens 10.000 Nachrichten pro Monat verarbeitet werden können.  
+
+/LL50/ Alle Datenübertragungen müssen verschlüsselt erfolgen.  
+
+/LL60/ Das System muss regelmäßige Datensicherungen ermöglichen.  
+
+\section{Qualitätsanforderungen}
+
+\begin{center}
+  \begin{tabular}{|l|c|c|c|c|}
+\hline
+Produktqualität & Sehr gut & Gut & Normal & Irrelevant \\ \hline
+Funktionalität & X & & & \\ \hline
+Zuverlässigkeit & X & & & \\ \hline
+Benutzbarkeit & & X & & \\ \hline
+Effizienz & & X & & \\ \hline
+Änderbarkeit & & & X & \\ \hline
+Übertragbarkeit & & X & & \\ \hline
+\end{tabular}  
+\end{center}
+
+\subsection*{Erläuterungen}
+
+\textbf{Funktionalität (Sehr gut):}  
+Alle Kernfunktionen müssen zuverlässig und vollständig verfügbar sein.
+
+\textbf{Zuverlässigkeit (Sehr gut):}  
+Das System muss stabil laufen und Daten konsistent speichern.
+
+\textbf{Benutzbarkeit (Gut):}  
+Die Oberfläche soll intuitiv bedienbar sein und schnelle Einarbeitung ermöglichen.
+
+\textbf{Effizienz (Gut):}  
+Das System soll ressourcenschonend arbeiten und schnelle Reaktionszeiten bieten.
+
+\textbf{Änderbarkeit (Normal):}  
+Die modulare Architektur ermöglicht Erweiterungen ohne Systemgefährdung.
+
+\textbf{Übertragbarkeit (Gut):}  
+Die Java-Basis ermöglicht plattformübergreifenden Betrieb.
+
+
+\newpage
+\section{Glossar}
+
+Hier werden die wichtigsten Fachbegriffe für das Projekt Chat-Co erläutert:
+
+\begin{description}
+\item[LDAP] \textit{Lightweight Directory Access Protocol}. Ein Standard-Protokoll zur Abfrage von Nutzerinformationen aus einem Verzeichnisdienst (z. B. Active Directory).
+\item[On-Premise] Software, die auf eigenen Servern im eigenen Rechenzentrum betrieben wird, statt sie als Dienst aus einer externen Cloud zu beziehen.
+\item[Spring Boot] Ein Java-basiertes Framework, das die Erstellung von Microservices und Web-Backends durch Konventionen vereinfacht.
+\item[Vaadin] Ein Web-Framework für Java, das es ermöglicht, moderne Benutzeroberflächen vollständig in Java zu programmieren.
+\item[WebSockets] Ein Kommunikationsprotokoll, das eine dauerhafte, bidirektionale Verbindung zwischen Client und Server ermöglicht.
+\item[MVC] \textit{Model-View-Controller}. Ein Architekturmuster zur Trennung von Datenmodell, Benutzeroberfläche und Steuerungslogik.
+\item[PostgreSQL] Ein objektrelationales Datenbankmanagementsystem.
+\item[TLS] \textit{Transport Layer Security}. Ein Verschlüsselungsprotokoll zur sicheren Datenübertragung.
+\item[JAR-Datei] \textit{Java Archive}. Ein Dateiformat zur Bündelung von Java-Anwendungen.
+\end{description}
+
+\end{document}

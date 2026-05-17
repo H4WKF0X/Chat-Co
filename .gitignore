@@ -1,51 +1,60 @@
-node_modules
-HELP.md
+# Dependencies
+node_modules/
+
+# Maven / Java build
 target/
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
 
-### STS ###
+# Gradle / build
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# Help / docs
+HELP.md
+docs/GUI_Plan.md
+
+# STS / Eclipse
 .apt_generated
 .classpath
 .factorypath
 .project
-.settings
+.settings/
 .springBeans
-.sts4-cache
+.sts4-cache/
 
-### IntelliJ IDEA ###
-.idea
+# IntelliJ IDEA
+.idea/
 *.iws
 *.iml
 *.ipr
-docs/GUI_Plan.md
 
-### NetBeans ###
+# NetBeans
 /nbproject/private/
 /nbbuild/
 /dist/
 /nbdist/
 /.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
 
-### VS Code ###
+# VS Code
 .vscode/
 
-### Claude Code ###
-.claude
+# Claude Code
+.claude/
 
-### Secret Properties ###
+# Secrets & keys / certificates
 src/main/resources/secret.properties
-
 *.jks
 *.crt
-*.bkp.DS_Store
+*.bkp
+*.der
 
+# macOS
+.DS_Store
 
-### Vaadin generated ###
+# Vaadin generated
 src/main/frontend/generated/
 src/main/frontend/index.html
 src/main/bundles/
@@ -54,7 +63,11 @@ vite.config.ts
 tsconfig.json
 types.d.ts
 
-### Secrets & logs ###
+# Secrets & logs
 .env
 .env.local
 *.log
+
+# Local Maven / Gradle caches
+.m2/
+.gradle/
