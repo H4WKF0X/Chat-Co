@@ -3,7 +3,7 @@ package com.chatco.chatco.view;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.auth.AnonymousAllowed;
+import jakarta.annotation.security.PermitAll;
 
 /**
  * Default home view shown when no conversation is selected.
@@ -12,7 +12,7 @@ import com.vaadin.flow.server.auth.AnonymousAllowed;
  * (e.g. unknown conversation ID, insufficient role for admin view).
  */
 @Route(value = "", layout = MainLayout.class)
-@AnonymousAllowed
+@PermitAll
 public class EmptyView extends Div {
 
     public EmptyView() {

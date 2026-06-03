@@ -4,6 +4,7 @@ package com.chatco.chatco.controller;
 import com.chatco.chatco.dto.MeetingRequest;
 import com.chatco.chatco.dto.MeetingResponse;
 import com.chatco.chatco.entity.*;
+import com.chatco.chatco.model.ConversationType;
 import com.chatco.chatco.repository.*;
 import com.chatco.chatco.web.ClientType;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -73,7 +74,7 @@ public class MeetingController {
         // Create the chat conversation first because the meeting has a required
         // one-to-one link to a conversation.
         Conversation conv = new Conversation();
-        conv.setType("group");
+        conv.setType(ConversationType.GROUP.name());
         conv.setTitle(req.title());
         conv.setCreator(creator);
         conv = conversationRepository.save(conv);

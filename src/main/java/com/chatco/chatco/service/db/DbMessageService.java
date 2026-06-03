@@ -36,6 +36,7 @@ public class DbMessageService implements MessageService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Message> getByConversation(Long conversationId) {
         return msgRepo.findMessageByConversationIdOrderBySentAtAsc(conversationId)
                 .stream().map(this::toRecord).toList();

@@ -18,7 +18,7 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.auth.AnonymousAllowed;
+import jakarta.annotation.security.PermitAll;
 
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
@@ -35,7 +35,7 @@ import java.util.List;
  * conversation, at which point {@link #beforeEnter} reloads data.
  */
 @Route(value = "conversation/:id", layout = MainLayout.class)
-@AnonymousAllowed
+@PermitAll
 public class ConversationView extends VerticalLayout implements BeforeEnterObserver {
 
     private static final DateTimeFormatter TIME_FMT = DateTimeFormatter.ofPattern("HH:mm");

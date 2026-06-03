@@ -22,7 +22,7 @@ import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.auth.AnonymousAllowed;
+import jakarta.annotation.security.PermitAll;
 
 /**
  * User settings view with four tabs: Profile, Appearance, Notifications, and Account.
@@ -32,7 +32,7 @@ import com.vaadin.flow.server.auth.AnonymousAllowed;
  * deactivation are stubbed and show a notification until the backend is connected.
  */
 @Route(value = "settings", layout = MainLayout.class)
-@AnonymousAllowed
+@PermitAll
 public class SettingsView extends VerticalLayout {
 
     public SettingsView(UserService userService) {

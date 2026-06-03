@@ -9,8 +9,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.List;
-
 @Component
 /**
  * Reads JWT bearer tokens from API requests and puts the username into the
@@ -19,9 +17,11 @@ import java.util.List;
 public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
+    private final UserAuthorityService userAuthorityService;
 
-    public JwtFilter(JwtUtil jwtUtil) {
+    public JwtFilter(JwtUtil jwtUtil, UserAuthorityService userAuthorityService) {
         this.jwtUtil = jwtUtil;
+        this.userAuthorityService = userAuthorityService;
     }
 
     @Override
@@ -39,7 +39,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 // The principal is only the username because controllers use it
                 // to load the full AppUser from the database when needed.
                 var auth = new UsernamePasswordAuthenticationToken(
-                        username, null, List.of()
+                        username, null, userAuthorityService.authoritiesForUsername(username)
                 );
                 SecurityContextHolder.getContext().setAuthentication(auth);
             }

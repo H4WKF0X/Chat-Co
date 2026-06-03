@@ -3,6 +3,7 @@ package com.chatco.chatco.service.db;
 import com.chatco.chatco.entity.UserRoleId;
 import com.chatco.chatco.model.AppUser;
 import com.chatco.chatco.model.UserRole;
+import com.chatco.chatco.model.UserRoleMapper;
 import com.chatco.chatco.model.UserStatus;
 import com.chatco.chatco.repository.AppUserRepository;
 import com.chatco.chatco.repository.RoleRepository;
@@ -53,7 +54,8 @@ public class DbUserService implements UserService {
             entity.setDisplayName(updated.displayName());
             entity.setMail(updated.mail());
             entity.setIsActive(updated.active());
-            userRepo.save(entity);
+            com.chatco.chatco.entity.AppUser saved = userRepo.save(entity);
+            assignRole(saved, updated.role());
         });
     }
 
@@ -67,25 +69,36 @@ public class DbUserService implements UserService {
         entity.setIsActive(true);
         com.chatco.chatco.entity.AppUser saved = userRepo.save(entity);
 
-        roleRepo.findByName(role.name()).ifPresent(roleEntity -> {
-            com.chatco.chatco.entity.UserRole userRole = new com.chatco.chatco.entity.UserRole();
-            userRole.setId(new UserRoleId(saved.getId(), roleEntity.getId()));
-            userRole.setUser(saved);
-            userRole.setRole(roleEntity);
-            userRoleRepo.save(userRole);
-        });
+        assignRole(saved, role);
+    }
+
+    private void assignRole(com.chatco.chatco.entity.AppUser user, UserRole role) {
+        com.chatco.chatco.entity.Role roleEntity = findOrCreateRole(role);
+        userRoleRepo.deleteAll(userRoleRepo.findByUserId(user.getId()));
+
+        com.chatco.chatco.entity.UserRole userRole = new com.chatco.chatco.entity.UserRole();
+        userRole.setId(new UserRoleId(user.getId(), roleEntity.getId()));
+        userRole.setUser(user);
+        userRole.setRole(roleEntity);
+        userRoleRepo.save(userRole);
+    }
+
+    private com.chatco.chatco.entity.Role findOrCreateRole(UserRole role) {
+        return UserRoleMapper.databaseNamesFor(role).stream()
+                .map(roleRepo::findByName)
+                .flatMap(Optional::stream)
+                .findFirst()
+                .orElseGet(() -> {
+                    com.chatco.chatco.entity.Role roleEntity = new com.chatco.chatco.entity.Role();
+                    roleEntity.setName(UserRoleMapper.databaseNamesFor(role).getFirst());
+                    return roleRepo.save(roleEntity);
+                });
     }
 
     AppUser toRecord(com.chatco.chatco.entity.AppUser entity) {
-        UserRole role = userRoleRepo.findByUserId(entity.getId()).stream()
+        UserRole role = userRoleRepo.findRoleNamesByUserId(entity.getId()).stream()
                 .findFirst()
-                .map(ur -> {
-                    try {
-                        return UserRole.valueOf(ur.getRole().getName());
-                    } catch (IllegalArgumentException e) {
-                        return UserRole.MITARBEITER;
-                    }
-                })
+                .map(UserRoleMapper::fromDatabaseName)
                 .orElse(UserRole.MITARBEITER);
         UserStatus status = Boolean.TRUE.equals(entity.getIsActive()) ? UserStatus.ACTIVE : UserStatus.INACTIVE;
         return new AppUser(

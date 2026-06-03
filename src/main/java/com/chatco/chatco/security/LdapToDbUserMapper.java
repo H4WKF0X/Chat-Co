@@ -3,13 +3,11 @@ package com.chatco.chatco.security;
 import com.chatco.chatco.entity.AppUser;
 import org.springframework.ldap.core.DirContextOperations;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.ldap.userdetails.UserDetailsContextMapper;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
-import java.util.List;
 
 @Component
 /**
@@ -19,9 +17,12 @@ import java.util.List;
 public class LdapToDbUserMapper implements UserDetailsContextMapper {
 
     private final UserProvisioningService userProvisioningService;
+    private final UserAuthorityService userAuthorityService;
 
-    public LdapToDbUserMapper(UserProvisioningService userProvisioningService) {
+    public LdapToDbUserMapper(UserProvisioningService userProvisioningService,
+                              UserAuthorityService userAuthorityService) {
         this.userProvisioningService = userProvisioningService;
+        this.userAuthorityService = userAuthorityService;
     }
 
     @Override
@@ -39,15 +40,9 @@ public class LdapToDbUserMapper implements UserDetailsContextMapper {
 
         AppUser appUser = userProvisioningService.loadOrCreateFromLdap(uid, username, cn, mail);
 
-        // Roles are currently local application roles. Every LDAP user receives
-        // ROLE_USER so authenticated web requests are allowed.
-        List<GrantedAuthority> mappedAuthorities = List.of(
-                new SimpleGrantedAuthority("ROLE_USER")
-        );
-
         return User.withUsername(appUser.getUsername())
                 .password("{noop}N/A")
-                .authorities(mappedAuthorities)
+                .authorities(userAuthorityService.authoritiesForUser(appUser))
                 .build();
     }
 

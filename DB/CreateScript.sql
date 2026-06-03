@@ -168,7 +168,7 @@ CREATE TABLE IF NOT EXISTS meeting_participant (
 -- Optionale Startdaten
 -- =========================
 INSERT INTO role (name) VALUES
-    ('ADMIN'),
-    ('EMPLOYEE'),
-    ('GUEST')
+    ('ADMINISTRATOR'),
+    ('MITARBEITER'),
+    ('GAST')
 ON CONFLICT (name) DO NOTHING;

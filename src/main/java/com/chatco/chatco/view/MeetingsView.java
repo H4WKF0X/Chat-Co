@@ -24,7 +24,7 @@ import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.auth.AnonymousAllowed;
+import jakarta.annotation.security.PermitAll;
 
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
@@ -40,7 +40,7 @@ import java.util.*;
  * group conversation. RSVP changes are persisted in-memory via {@link MeetingService}.
  */
 @Route(value = "meetings", layout = MainLayout.class)
-@AnonymousAllowed
+@PermitAll
 public class MeetingsView extends VerticalLayout {
 
     private static final DateTimeFormatter TIME_FMT = DateTimeFormatter.ofPattern("HH:mm");

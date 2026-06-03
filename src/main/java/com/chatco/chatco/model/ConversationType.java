@@ -10,5 +10,12 @@ package com.chatco.chatco.model;
  * </ul>
  */
 public enum ConversationType {
-    CHANNEL, DIRECT, GROUP
+    CHANNEL, DIRECT, GROUP;
+
+    public static ConversationType fromDatabaseValue(String value) {
+        if (value == null || value.isBlank()) {
+            return CHANNEL;
+        }
+        return ConversationType.valueOf(value.trim().toUpperCase());
+    }
 }

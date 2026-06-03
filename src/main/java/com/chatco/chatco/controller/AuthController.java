@@ -5,6 +5,7 @@ import com.chatco.chatco.dto.LoginRequest;
 import com.chatco.chatco.dto.LoginResponse;
 import com.chatco.chatco.security.JwtUtil;
 import com.chatco.chatco.security.LdapAuthService;
+import com.chatco.chatco.security.UserProvisioningService;
 import com.chatco.chatco.web.ClientType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,10 +30,14 @@ public class AuthController {
 
     private final LdapAuthService ldapAuthService;
     private final JwtUtil jwtUtil;
+    private final UserProvisioningService userProvisioningService;
 
-    public AuthController(LdapAuthService ldapAuthService, JwtUtil jwtUtil) {
+    public AuthController(LdapAuthService ldapAuthService,
+                          JwtUtil jwtUtil,
+                          UserProvisioningService userProvisioningService) {
         this.ldapAuthService = ldapAuthService;
         this.jwtUtil = jwtUtil;
+        this.userProvisioningService = userProvisioningService;
     }
 
     /**
@@ -62,6 +67,9 @@ public class AuthController {
         String mail = Optional.ofNullable(profile.get("mail"))
                 .map(Object::toString)
                 .orElse("");
+
+        userProvisioningService.loadOrCreateFromLdap(
+                request.username(), request.username(), displayName, mail);
 
         String token = jwtUtil.generateToken(request.username());
 

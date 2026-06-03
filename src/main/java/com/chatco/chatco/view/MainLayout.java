@@ -12,7 +12,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.AfterNavigationObserver;
 import com.vaadin.flow.router.RouterLayout;
-import com.vaadin.flow.server.auth.AnonymousAllowed;
+import jakarta.annotation.security.PermitAll;
 
 /**
  * Application shell shared by all routes.
@@ -22,7 +22,7 @@ import com.vaadin.flow.server.auth.AnonymousAllowed;
  * the active rail icon and sidebar state in sync with the current route.
  * The admin rail icon is hidden for non-administrator users.
  */
-@AnonymousAllowed
+@PermitAll
 public class MainLayout extends HorizontalLayout implements RouterLayout, AfterNavigationObserver {
 
     private final SidebarComponent sidebar;
