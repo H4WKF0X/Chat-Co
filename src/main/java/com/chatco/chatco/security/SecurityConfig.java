@@ -44,8 +44,8 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .anyRequest().authenticated()
+                        .requestMatchers("/api/**").authenticated()  // nur API absichern
+                        .anyRequest().permitAll()                    // Rest Vaadin überlassen
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .formLogin(AbstractHttpConfigurer::disable)
@@ -63,11 +63,14 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // Vaadin framework resources
                         .requestMatchers(
+                                "/",
                                 "/VAADIN/**", "/PUSH/**", "/UIDL/**",
                                 "/vaadinServlet/**", "/frontend/**",
                                 "/sw.js", "/sw-runtime-resources-precache.js",
-                                "/offline.html", "/manifest.webmanifest",
-                                "/icons/**", "/images/**", "/themes/**"
+                                "/offline.html", "/offline-stub.html",   // <-- offline-stub.html hinzugefügt
+                                "/manifest.webmanifest",
+                                "/icons/**", "/images/**", "/themes/**",
+                                "/?v-r=init**"                            // <-- Vaadin init requests
                         ).permitAll()
                         // Login page itself must be public
                         .requestMatchers("/ldap-login").permitAll()
@@ -75,6 +78,7 @@ public class SecurityConfig {
                 )
                 .formLogin(form -> form
                         .loginPage("/ldap-login")
+                        .defaultSuccessUrl("/", true)   // <-- nach Login immer auf / weiterleiten
                         .permitAll()
                 )
                 .build();

@@ -54,7 +54,7 @@ public class LdapLoginView extends VerticalLayout {
                 HttpServletResponse response = VaadinServletResponse.getCurrent().getHttpServletResponse();
                 securityContextRepository.saveContext(context, request, response);
 
-                UI.getCurrent().navigate("");
+                UI.getCurrent().getPage().setLocation("/");
             } else {
                 Notification.show("Login fehlgeschlagen");
             }
