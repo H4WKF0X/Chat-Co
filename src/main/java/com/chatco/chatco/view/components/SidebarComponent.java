@@ -46,14 +46,14 @@ public class SidebarComponent extends VerticalLayout {
         workspaceHeader.addClassName("cc-workspace-header");
         workspaceHeader.setText("Chat-Co");
 
-        Long currentUserId = userService.getCurrentUser().id();
+        AppUser currentUser = userService.getCurrentUser();
 
         Div scrollArea = new Div();
         scrollArea.addClassName("cc-sidebar-scroll");
         scrollArea.add(
-                buildSection("# Channels",       ConversationType.CHANNEL, conversationService, "new-channel", currentUserId),
-                buildSection("⊞ Groups",          ConversationType.GROUP,   conversationService, "new-group",   currentUserId),
-                buildSection("Direct Messages",   ConversationType.DIRECT,  conversationService, "new-dm",      currentUserId)
+                buildSection("# Channels",       ConversationType.CHANNEL, conversationService, "new-channel", currentUser),
+                buildSection("⊞ Groups",          ConversationType.GROUP,   conversationService, "new-group",   currentUser),
+                buildSection("Direct Messages",   ConversationType.DIRECT,  conversationService, "new-dm",      currentUser)
         );
 
         Div userFooter = buildUserFooter(userService);
@@ -63,7 +63,7 @@ public class SidebarComponent extends VerticalLayout {
     }
 
     private Div buildSection(String title, ConversationType type,
-                             ConversationService conversationService, String addRoute, Long currentUserId) {
+                             ConversationService conversationService, String addRoute, AppUser currentUser) {
         Div section = new Div();
         section.addClassName("cc-sidebar-section");
 
@@ -92,20 +92,20 @@ public class SidebarComponent extends VerticalLayout {
 
         for (Conversation conv : conversationService.getByType(type)) {
             List<AppUser> members = conversationService.getMembers(conv.id());
-            if (members.stream().noneMatch(m -> m.id().equals(currentUserId))) continue;
-            Div item = buildNavItem(conv);
+            if (members.stream().noneMatch(m -> m.id().equals(currentUser.id()))) continue;
+            Div item = buildNavItem(conv, members, currentUser);
             navItems.put(conv.id(), item);
             section.add(item);
         }
         return section;
     }
 
-    private Div buildNavItem(Conversation conv) {
+    private Div buildNavItem(Conversation conv, List<AppUser> members, AppUser currentUser) {
         Div item = new Div();
         item.addClassName("cc-nav-item");
 
         String prefix = conv.type() == ConversationType.CHANNEL ? "# " : " ";
-        Span label = new Span(prefix + conv.title());
+        Span label = new Span(prefix + conv.displayTitle(currentUser, members));
         label.addClassName("cc-nav-item-label");
 
         item.add(label);

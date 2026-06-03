@@ -11,7 +11,7 @@ import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.auth.AnonymousAllowed;
+import jakarta.annotation.security.PermitAll;
 
 import java.util.List;
 
@@ -22,7 +22,7 @@ import java.util.List;
  * user opens the existing DM if one already exists, otherwise creates a new one.
  */
 @Route(value = "new-dm", layout = MainLayout.class)
-@AnonymousAllowed
+@PermitAll
 public class NewDmView extends VerticalLayout {
 
     public NewDmView(UserService userService, ConversationService conversationService) {
