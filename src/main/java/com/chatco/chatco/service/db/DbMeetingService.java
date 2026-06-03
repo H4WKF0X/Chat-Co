@@ -43,16 +43,19 @@ public class DbMeetingService implements MeetingService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Meeting> getAll() {
         return meetingRepo.findAll().stream().map(this::toRecord).toList();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<Meeting> findById(Long id) {
         return meetingRepo.findById(id).map(this::toRecord);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Meeting> getByUser(Long userId) {
         return participantRepo.findByUser_Id(userId).stream()
                 .map(p -> toRecord(p.getMeeting()))
@@ -60,6 +63,7 @@ public class DbMeetingService implements MeetingService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<MeetingParticipant> getParticipants(Long meetingId) {
         return participantRepo.findByMeeting_Id(meetingId).stream()
                 .map(this::toParticipantRecord)
@@ -120,6 +124,7 @@ public class DbMeetingService implements MeetingService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public boolean isRoomAvailable(Room room, OffsetDateTime startAt, OffsetDateTime endAt) {
         if (room == null) return true;
         return meetingRepo.findOverlappingInRoom(room.id(), startAt, endAt).isEmpty();

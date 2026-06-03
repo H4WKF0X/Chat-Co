@@ -1,5 +1,7 @@
 package com.chatco.chatco.model;
 
+import java.util.Locale;
+
 /**
  * Classifies a conversation by its structural type.
  *
@@ -10,5 +12,16 @@ package com.chatco.chatco.model;
  * </ul>
  */
 public enum ConversationType {
-    CHANNEL, DIRECT, GROUP
+    CHANNEL, DIRECT, GROUP;
+
+    public String databaseValue() {
+        return name().toLowerCase(Locale.ROOT);
+    }
+
+    public static ConversationType fromDatabaseValue(String value) {
+        if (value == null || value.isBlank()) {
+            return CHANNEL;
+        }
+        return ConversationType.valueOf(value.trim().toUpperCase());
+    }
 }

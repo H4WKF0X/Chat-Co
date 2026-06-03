@@ -1,5 +1,7 @@
 package com.chatco.chatco.security;
 
+import com.chatco.chatco.view.LdapLoginView;
+import com.vaadin.flow.spring.security.VaadinSecurityConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -44,8 +46,9 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .anyRequest().authenticated()
+                        .requestMatchers("/api/auth/login").permitAll()
+                        .requestMatchers("/api/**").authenticated()
+                        .anyRequest().permitAll()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .formLogin(AbstractHttpConfigurer::disable)
@@ -58,25 +61,11 @@ public class SecurityConfig {
     @Order(2)
     public SecurityFilterChain webFilterChain(HttpSecurity http) throws Exception {
         return http
-                // Vaadin manages its own CSRF via synchronised token pattern
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> auth
-                        // Vaadin framework resources
-                        .requestMatchers(
-                                "/VAADIN/**", "/PUSH/**", "/UIDL/**",
-                                "/vaadinServlet/**", "/frontend/**",
-                                "/sw.js", "/sw-runtime-resources-precache.js",
-                                "/offline.html", "/manifest.webmanifest",
-                                "/icons/**", "/images/**", "/themes/**"
-                        ).permitAll()
-                        // Login page itself must be public
-                        .requestMatchers("/ldap-login").permitAll()
-                        .anyRequest().authenticated()
-                )
-                .formLogin(form -> form
-                        .loginPage("/ldap-login")
-                        .permitAll()
-                )
+                .with(VaadinSecurityConfigurer.vaadin(), vaadin -> vaadin
+                        .loginView(LdapLoginView.class)
+                        .defaultSuccessUrl("/", true)
+                        .enableCsrfConfiguration(false))
                 .build();
     }
 }

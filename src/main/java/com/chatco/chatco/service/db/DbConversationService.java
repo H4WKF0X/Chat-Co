@@ -38,6 +38,7 @@ public class DbConversationService implements ConversationService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Conversation> getAll() {
         AppUser current = userService.getCurrentUser();
         return memberRepo.findConversationMemberByUserId(current.id()).stream()
@@ -46,16 +47,19 @@ public class DbConversationService implements ConversationService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Conversation> getByType(ConversationType type) {
         return getAll().stream().filter(c -> c.type() == type).toList();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<Conversation> findById(Long id) {
         return convRepo.findById(id).map(this::toRecord);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<AppUser> getMembers(Long conversationId) {
         return memberRepo.findConversationMemberByConversationId(conversationId).stream()
                 .map(cm -> dbUserService.toRecord(cm.getUser()))
@@ -76,7 +80,7 @@ public class DbConversationService implements ConversationService {
         creatorEntity.setId(creator.id());
 
         com.chatco.chatco.entity.Conversation convEntity = new com.chatco.chatco.entity.Conversation();
-        convEntity.setType(type.name());
+        convEntity.setType(type.databaseValue());
         convEntity.setTitle(title);
         convEntity.setCreator(creatorEntity);
         convEntity.setCreatedAt(OffsetDateTime.now());
@@ -101,7 +105,7 @@ public class DbConversationService implements ConversationService {
 
     private Optional<Conversation> findExistingDirect(Long currentUserId, List<Long> memberUserIds) {
         return memberRepo.findConversationMemberByUserId(currentUserId).stream()
-                .filter(cm -> "DIRECT".equals(cm.getConversation().getType()))
+                .filter(cm -> ConversationType.fromDatabaseValue(cm.getConversation().getType()) == ConversationType.DIRECT)
                 .filter(cm -> {
                     Long otherId = memberUserIds.stream()
                             .filter(id -> !id.equals(currentUserId))
@@ -129,7 +133,7 @@ public class DbConversationService implements ConversationService {
                 : null;
         return new Conversation(
                 entity.getId(),
-                ConversationType.valueOf(entity.getType()),
+                ConversationType.fromDatabaseValue(entity.getType()),
                 entity.getTitle(),
                 creator,
                 entity.getCreatedAt()

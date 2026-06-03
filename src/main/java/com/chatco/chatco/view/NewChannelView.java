@@ -12,7 +12,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.auth.AnonymousAllowed;
+import jakarta.annotation.security.PermitAll;
 
 import java.util.List;
 import java.util.Locale;
@@ -25,7 +25,7 @@ import java.util.Locale;
  * not yet persisted by the stub backend.
  */
 @Route(value = "new-channel", layout = MainLayout.class)
-@AnonymousAllowed
+@PermitAll
 public class NewChannelView extends VerticalLayout {
 
     public NewChannelView(ConversationService conversationService) {

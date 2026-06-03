@@ -14,7 +14,7 @@ import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.auth.AnonymousAllowed;
+import jakarta.annotation.security.PermitAll;
 
 import java.util.*;
 
@@ -25,7 +25,7 @@ import java.util.*;
  * other users with checkboxes. Clicking a row toggles the checkbox.
  */
 @Route(value = "new-group", layout = MainLayout.class)
-@AnonymousAllowed
+@PermitAll
 public class NewGroupView extends VerticalLayout {
 
     private final Set<Long> selectedIds = new HashSet<>();

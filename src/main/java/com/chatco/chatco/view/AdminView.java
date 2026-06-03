@@ -17,10 +17,8 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
-import com.vaadin.flow.router.BeforeEnterEvent;
-import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.auth.AnonymousAllowed;
+import jakarta.annotation.security.RolesAllowed;
 
 import java.time.format.DateTimeFormatter;
 
@@ -34,8 +32,8 @@ import java.time.format.DateTimeFormatter;
  * notification until the backend is connected.
  */
 @Route(value = "admin", layout = MainLayout.class)
-@AnonymousAllowed
-public class AdminView extends VerticalLayout implements BeforeEnterObserver {
+@RolesAllowed("ADMINISTRATOR")
+public class AdminView extends VerticalLayout {
 
     private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 
@@ -50,14 +48,7 @@ public class AdminView extends VerticalLayout implements BeforeEnterObserver {
         setSizeFull();
         setPadding(false);
         setSpacing(false);
-    }
 
-    @Override
-    public void beforeEnter(BeforeEnterEvent event) {
-        if (userService.getCurrentUser().role() != UserRole.ADMINISTRATOR) {
-            event.forwardTo(EmptyView.class);
-            return;
-        }
         buildContent();
     }
 
