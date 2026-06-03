@@ -74,7 +74,7 @@ public class MeetingController {
         // Create the chat conversation first because the meeting has a required
         // one-to-one link to a conversation.
         Conversation conv = new Conversation();
-        conv.setType(ConversationType.GROUP.name());
+        conv.setType(ConversationType.GROUP.databaseValue());
         conv.setTitle(req.title());
         conv.setCreator(creator);
         conv = conversationRepository.save(conv);

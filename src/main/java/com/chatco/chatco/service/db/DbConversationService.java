@@ -80,7 +80,7 @@ public class DbConversationService implements ConversationService {
         creatorEntity.setId(creator.id());
 
         com.chatco.chatco.entity.Conversation convEntity = new com.chatco.chatco.entity.Conversation();
-        convEntity.setType(type.name());
+        convEntity.setType(type.databaseValue());
         convEntity.setTitle(title);
         convEntity.setCreator(creatorEntity);
         convEntity.setCreatedAt(OffsetDateTime.now());

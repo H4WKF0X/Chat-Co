@@ -2,9 +2,11 @@ package com.chatco.chatco.view;
 
 import com.chatco.chatco.model.*;
 import com.chatco.chatco.service.ConversationService;
+import com.chatco.chatco.service.MessageBroadcaster;
 import com.chatco.chatco.service.MessageService;
 import com.chatco.chatco.service.UserService;
 import com.chatco.chatco.view.components.UserDetailDialog;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -18,6 +20,7 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.shared.Registration;
 import jakarta.annotation.security.PermitAll;
 
 import java.time.LocalDate;
@@ -44,6 +47,7 @@ public class ConversationView extends VerticalLayout implements BeforeEnterObser
     private final MessageService messageService;
     private final ConversationService conversationService;
     private final UserService userService;
+    private final MessageBroadcaster messageBroadcaster;
 
     private final Span headerIcon  = new Span();
     private final Span headerTitle = new Span();
@@ -54,15 +58,20 @@ public class ConversationView extends VerticalLayout implements BeforeEnterObser
 
     private Conversation conversation;
     private Message pendingReplyTo = null;
+    private Registration messageRegistration;
 
     private final Div  replyBar        = new Div();
     private final Span replyBarSender  = new Span();
     private final Span replyBarPreview = new Span();
 
-    public ConversationView(MessageService messageService, ConversationService conversationService, UserService userService) {
+    public ConversationView(MessageService messageService,
+                            ConversationService conversationService,
+                            UserService userService,
+                            MessageBroadcaster messageBroadcaster) {
         this.messageService = messageService;
         this.conversationService = conversationService;
         this.userService = userService;
+        this.messageBroadcaster = messageBroadcaster;
 
         addClassName("cc-chat-view");
         setSizeFull();
@@ -86,6 +95,8 @@ public class ConversationView extends VerticalLayout implements BeforeEnterObser
 
         add(buildHeader(), body);
         expand(body);
+
+        addDetachListener(e -> unregisterMessageUpdates());
     }
 
     private Div buildHeader() {
@@ -221,19 +232,39 @@ public class ConversationView extends VerticalLayout implements BeforeEnterObser
                     .flatMap(conversationService::findById)
                     .ifPresentOrElse(conv -> {
                         conversation = conv;
+                        registerMessageUpdates(conv.id());
                         clearReplyTarget();
                         updateHeader(conv);
                         refreshMessages();
                         if (memberPanelOpen) rebuildMemberPanel();
                     }, () -> event.forwardTo(EmptyView.class));
         } catch (NumberFormatException e) {
+            unregisterMessageUpdates();
             event.forwardTo(EmptyView.class);
+        }
+    }
+
+    private void registerMessageUpdates(Long conversationId) {
+        unregisterMessageUpdates();
+        UI ui = UI.getCurrent();
+        messageRegistration = messageBroadcaster.register(conversationId, changedConversationId ->
+                ui.access(() -> {
+                    if (conversation != null && conversation.id().equals(changedConversationId)) {
+                        refreshMessages();
+                    }
+                }));
+    }
+
+    private void unregisterMessageUpdates() {
+        if (messageRegistration != null) {
+            messageRegistration.remove();
+            messageRegistration = null;
         }
     }
 
     private void updateHeader(Conversation conv) {
         headerIcon.setText(conv.type() == ConversationType.CHANNEL ? "#" : conv.type() == ConversationType.GROUP ? "⊞" : "");
-        headerTitle.setText(conv.title());
+        headerTitle.setText(conv.displayTitle(userService.getCurrentUser(), conversationService.getMembers(conv.id())));
         headerMeta.setText(switch (conv.type()) {
             case CHANNEL -> "channel";
             case DIRECT  -> "direct message";
