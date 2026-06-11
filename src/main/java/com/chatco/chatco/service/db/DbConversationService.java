@@ -41,7 +41,16 @@ public class DbConversationService implements ConversationService {
     @Transactional(readOnly = true)
     public List<Conversation> getAll() {
         AppUser current = userService.getCurrentUser();
-        return memberRepo.findConversationMemberByUserId(current.id()).stream()
+        return memberRepo.findActiveByUserId(current.id()).stream()
+                .map(cm -> toRecord(cm.getConversation()))
+                .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Conversation> getArchived() {
+        AppUser current = userService.getCurrentUser();
+        return memberRepo.findArchivedByUserId(current.id()).stream()
                 .map(cm -> toRecord(cm.getConversation()))
                 .toList();
     }
@@ -103,6 +112,19 @@ public class DbConversationService implements ConversationService {
         convRepo.deleteById(id);
     }
 
+    @Override
+    @Transactional
+    public void archiveById(Long id) {
+        memberRepo.archiveByConversationId(id);
+    }
+
+    @Override
+    @Transactional
+    public void unarchiveById(Long id) {
+        AppUser current = userService.getCurrentUser();
+        memberRepo.unarchiveByConversationIdAndUserId(id, current.id());
+    }
+
     private Optional<Conversation> findExistingDirect(Long currentUserId, List<Long> memberUserIds) {
         return memberRepo.findConversationMemberByUserId(currentUserId).stream()
                 .filter(cm -> ConversationType.fromDatabaseValue(cm.getConversation().getType()) == ConversationType.DIRECT)
@@ -123,7 +145,7 @@ public class DbConversationService implements ConversationService {
         ConversationMemberId memberId = new ConversationMemberId();
         memberId.setConversationId(conv.getId());
         memberId.setUserId(userId);
-        ConversationMember member = new ConversationMember(memberId, conv, userRef);
+        ConversationMember member = new ConversationMember(memberId, conv, userRef, false);
         memberRepo.save(member);
     }
 

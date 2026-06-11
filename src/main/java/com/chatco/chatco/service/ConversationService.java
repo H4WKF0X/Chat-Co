@@ -18,6 +18,9 @@ public interface ConversationService {
     /** Returns all conversations regardless of type. */
     List<Conversation> getAll();
 
+    /** Returns archived conversations for the current user. */
+    List<Conversation> getArchived();
+
     /**
      * Returns all conversations of the given type.
      *
@@ -63,4 +66,13 @@ public interface ConversationService {
      * @param id the conversation ID to delete
      */
     void deleteById(Long id);
+
+    /**
+     * Archives the conversation for all current members without deleting its
+     * messages or membership records.
+     */
+    void archiveById(Long id);
+
+    /** Restores an archived conversation for the current user. */
+    void unarchiveById(Long id);
 }

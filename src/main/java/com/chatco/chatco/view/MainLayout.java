@@ -107,6 +107,7 @@ public class MainLayout extends HorizontalLayout implements RouterLayout, AfterN
     @Override
     public void afterNavigation(AfterNavigationEvent event) {
         String path = event.getLocation().getPath();
+        sidebar.refresh();
 
         railChat.removeClassName("cc-rail-btn--active");
         railMeetings.removeClassName("cc-rail-btn--active");

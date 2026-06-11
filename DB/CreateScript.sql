@@ -122,6 +122,7 @@ CREATE TABLE IF NOT EXISTS user_role (
 CREATE TABLE IF NOT EXISTS conversation_member (
     user_id          BIGINT NOT NULL,
     conversation_id  BIGINT NOT NULL,
+    archived         BOOLEAN NOT NULL DEFAULT FALSE,
     PRIMARY KEY (user_id, conversation_id),
     CONSTRAINT fk_conv_member_user
         FOREIGN KEY (user_id)
@@ -132,6 +133,10 @@ CREATE TABLE IF NOT EXISTS conversation_member (
         REFERENCES conversation(id)
         ON DELETE CASCADE
 );
+
+-- Also updates databases that were created before chat archiving was added.
+ALTER TABLE conversation_member
+    ADD COLUMN IF NOT EXISTS archived BOOLEAN NOT NULL DEFAULT FALSE;
 
 -- 10) Nachricht <-> Dateianhang (n:m)
 CREATE TABLE IF NOT EXISTS message_attachment (

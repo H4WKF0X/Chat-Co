@@ -3,6 +3,8 @@ package com.chatco.chatco.service.db;
 import com.chatco.chatco.entity.MeetingParticipantId;
 import com.chatco.chatco.model.*;
 import com.chatco.chatco.repository.MeetingParticipantRepository;
+import com.chatco.chatco.repository.ConversationRepository;
+import com.chatco.chatco.repository.RoomRepository;
 import com.chatco.chatco.repository.MeetingRepository;
 import com.chatco.chatco.service.ConversationService;
 import com.chatco.chatco.service.MeetingService;
@@ -13,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 @Service
@@ -25,14 +28,20 @@ public class DbMeetingService implements MeetingService {
     private final DbUserService dbUserService;
     private final DbConversationService dbConversationService;
     private final DbRoomService dbRoomService;
+    private final ConversationRepository conversationRepo;
+    private final RoomRepository roomRepo;
 
-    public DbMeetingService(MeetingRepository meetingRepo,
+    public DbMeetingService(ConversationRepository conversationRepo,
+                            RoomRepository roomRepo,
+                            MeetingRepository meetingRepo,
                             MeetingParticipantRepository participantRepo,
                             @Lazy UserService userService,
                             @Lazy ConversationService conversationService,
                             DbUserService dbUserService,
                             DbConversationService dbConversationService,
                             DbRoomService dbRoomService) {
+        this.conversationRepo = conversationRepo;
+        this.roomRepo = roomRepo;
         this.meetingRepo = meetingRepo;
         this.participantRepo = participantRepo;
         this.userService = userService;
@@ -82,8 +91,7 @@ public class DbMeetingService implements MeetingService {
 
         Conversation conv = conversationService.create(ConversationType.GROUP, title, participantUserIds);
 
-        com.chatco.chatco.entity.Conversation convRef = new com.chatco.chatco.entity.Conversation();
-        convRef.setId(conv.id());
+        var convRef = conversationRepo.getReferenceById(conv.id());
 
         com.chatco.chatco.entity.Meeting meetingEntity = new com.chatco.chatco.entity.Meeting();
         meetingEntity.setTitle(title);
@@ -94,10 +102,9 @@ public class DbMeetingService implements MeetingService {
         meetingEntity.setConversation(convRef);
 
         if (room != null) {
-            com.chatco.chatco.entity.Room roomRef = new com.chatco.chatco.entity.Room();
-            roomRef.setId(room.id());
-            meetingEntity.setRoom(roomRef);
+            meetingEntity.setRoom(roomRepo.getReferenceById(room.id()));
         }
+
 
         com.chatco.chatco.entity.Meeting saved = meetingRepo.save(meetingEntity);
 
@@ -118,7 +125,7 @@ public class DbMeetingService implements MeetingService {
         pid.setMeetingId(meetingId);
         pid.setUserId(userId);
         participantRepo.findById(pid).ifPresent(entity -> {
-            entity.setParticipantStatus(status.name());
+            entity.setParticipantStatus(status.name().toLowerCase(Locale.ROOT));
             participantRepo.save(entity);
         });
     }
@@ -137,7 +144,7 @@ public class DbMeetingService implements MeetingService {
         pid.setMeetingId(meeting.getId());
         pid.setUserId(userId);
         com.chatco.chatco.entity.MeetingParticipant participant =
-                new com.chatco.chatco.entity.MeetingParticipant(pid, meeting, userRef, status.name());
+                new com.chatco.chatco.entity.MeetingParticipant(pid, meeting, userRef, status.name().toLowerCase(Locale.ROOT));
         participantRepo.save(participant);
     }
 
@@ -162,10 +169,21 @@ public class DbMeetingService implements MeetingService {
         AppUser user = dbUserService.toRecord(entity.getUser());
         ParticipantStatus status;
         try {
-            status = ParticipantStatus.valueOf(entity.getParticipantStatus());
+            status = ParticipantStatus.valueOf(entity.getParticipantStatus().toUpperCase(Locale.ROOT));
         } catch (IllegalArgumentException e) {
             status = ParticipantStatus.INVITED;
         }
         return new MeetingParticipant(meeting, user, status);
+    }
+
+    @Override
+    @Transactional
+    public void deleteById(Long meetingId) {
+        var meeting = meetingRepo.findById(meetingId)
+                .orElseThrow(() -> new IllegalArgumentException("Meeting not found"));
+
+        Long conversationId = meeting.getConversation().getId();
+        conversationService.archiveById(conversationId);
+        meetingRepo.delete(meeting);
     }
 }

@@ -77,4 +77,6 @@ public interface MeetingService {
      * Always returns true when room is null (remote/no-room meetings).
      */
     boolean isRoomAvailable(Room room, OffsetDateTime startAt, OffsetDateTime endAt);
+
+    void deleteById(Long meetingId);
 }

@@ -288,8 +288,17 @@ public class MeetingsView extends VerticalLayout {
 
         Button close = new Button("Close", e -> dialog.close());
         close.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_SMALL);
+        Button delete = new Button("Delete Meeting", event -> {
+            meetingService.deleteById(meeting.id());
+            dialog.close();
+            buildMeetingsList();
+        });
+        delete.addThemeVariants(
+                ButtonVariant.LUMO_ERROR,
+                ButtonVariant.LUMO_TERTIARY
+        );
 
-        HorizontalLayout footer = new HorizontalLayout(openChat, myActions, close);
+        HorizontalLayout footer = new HorizontalLayout(openChat, myActions, delete, close);
         footer.addClassName("cc-detail-footer");
 
         dialog.add(timeRow, roomRow, descRow, partLabel, partList, footer);

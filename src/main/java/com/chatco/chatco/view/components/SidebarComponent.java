@@ -7,6 +7,8 @@ import com.chatco.chatco.service.ConversationService;
 import com.chatco.chatco.service.UserService;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.avatar.Avatar;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -27,6 +29,9 @@ import java.util.function.Consumer;
 public class SidebarComponent extends VerticalLayout {
 
     private final Map<Long, Div> navItems = new HashMap<>();
+    private final ConversationService conversationService;
+    private final UserService userService;
+    private final Div scrollArea = new Div();
     private Consumer<Conversation> onSelect;
 
     // Stub unread counts keyed by conversation ID (conversation IDs per StubDataStore: general → 1, dev-talk → 2, dm-alex → 4)
@@ -37,6 +42,9 @@ public class SidebarComponent extends VerticalLayout {
     );
 
     public SidebarComponent(ConversationService conversationService, UserService userService) {
+        this.conversationService = conversationService;
+        this.userService = userService;
+
         addClassName("cc-sidebar");
         setSizeUndefined();
         setPadding(false);
@@ -46,20 +54,77 @@ public class SidebarComponent extends VerticalLayout {
         workspaceHeader.addClassName("cc-workspace-header");
         workspaceHeader.setText("Chat-Co");
 
-        AppUser currentUser = userService.getCurrentUser();
-
-        Div scrollArea = new Div();
         scrollArea.addClassName("cc-sidebar-scroll");
-        scrollArea.add(
-                buildSection("# Channels",       ConversationType.CHANNEL, conversationService, "new-channel", currentUser),
-                buildSection("⊞ Groups",          ConversationType.GROUP,   conversationService, "new-group",   currentUser),
-                buildSection("Direct Messages",   ConversationType.DIRECT,  conversationService, "new-dm",      currentUser)
-        );
+        refresh();
 
         Div userFooter = buildUserFooter(userService);
 
         add(workspaceHeader, scrollArea, userFooter);
         expand(scrollArea);
+    }
+
+    public void refresh() {
+        navItems.clear();
+        scrollArea.removeAll();
+
+        AppUser currentUser = userService.getCurrentUser();
+        scrollArea.add(
+                buildArchivedSection(currentUser),
+                buildSection("# Channels", ConversationType.CHANNEL, conversationService, "new-channel", currentUser),
+                buildSection("⊞ Groups", ConversationType.GROUP, conversationService, "new-group", currentUser),
+                buildSection("Direct Messages", ConversationType.DIRECT, conversationService, "new-dm", currentUser)
+        );
+    }
+
+    private Div buildArchivedSection(AppUser currentUser) {
+        List<Conversation> archived = conversationService.getArchived();
+
+        Div section = new Div();
+        section.addClassName("cc-sidebar-section");
+        section.setVisible(!archived.isEmpty());
+
+        Span title = new Span("Archived (" + archived.size() + ")");
+        title.addClassName("cc-sidebar-section-title-text");
+
+        Div archivedList = new Div();
+        archivedList.setVisible(false);
+
+        for (Conversation conversation : archived) {
+            List<AppUser> members = conversationService.getMembers(conversation.id());
+            Div item = buildNavItem(conversation, members, currentUser);
+
+            Button restore = new Button("Restore", event -> {
+                conversationService.unarchiveById(conversation.id());
+                refresh();
+            });
+            restore.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE, ButtonVariant.LUMO_SMALL);
+            restore.getElement().setAttribute("title", "Restore conversation");
+            restore.addAttachListener(event -> restore.getElement().executeJs(
+                    "this.addEventListener('click', event => event.stopPropagation())"));
+            item.add(restore);
+
+            navItems.put(conversation.id(), item);
+            archivedList.add(item);
+        }
+
+        Span toggle = new Span("›");
+        Div header = new Div(title, toggle);
+        header.addClassName("cc-sidebar-section-title");
+        header.addClassName("cc-clickable");
+        header.getElement().setAttribute("role", "button");
+        header.getElement().setAttribute("tabindex", "0");
+
+        Runnable toggleArchived = () -> {
+            boolean visible = !archivedList.isVisible();
+            archivedList.setVisible(visible);
+            toggle.setText(visible ? "⌄" : "›");
+        };
+        header.addClickListener(event -> toggleArchived.run());
+        header.getElement().addEventListener("keydown", event -> toggleArchived.run())
+                .setFilter("event.key === 'Enter' || event.key === ' '");
+
+        section.add(header, archivedList);
+        return section;
     }
 
     private Div buildSection(String title, ConversationType type,
